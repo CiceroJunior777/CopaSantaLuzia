@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel do Administrador — Copa Santa Luzia</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Leitura de planilhas .xlsx/.xls (o .csv funciona mesmo sem esta biblioteca) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+  <!-- LOGIN DO ADMINISTRADOR -->
+  <div id="login-screen" class="login-wrap" hidden>
+    <div class="login-card">
+      <div style="font-size:2.2rem">🔐</div>
+      <h1>Painel do Administrador</h1>
+      <p class="muted">Acesso restrito à organização do campeonato.</p>
+      <form id="admin-form" autocomplete="on">
+        <label>Usuário<input name="username" autocomplete="username" required autofocus></label>
+        <label>Senha<input name="password" type="password" autocomplete="current-password" required></label>
+        <div class="err" id="login-err"></div>
+        <button class="btn" style="width:100%">Entrar</button>
+      </form>
+      <a class="link-admin" href="index.html">← Voltar ao site</a>
+    </div>
+  </div>
+
+  <!-- PAINEL -->
+  <div id="app" hidden>
+    <header class="topbar">
+      <div class="topbar-in">
+        <div class="brand"><span class="ball">⚽</span><span>Admin · <span id="app-name">Copa Santa Luzia</span></span></div>
+        <div class="who">
+          <span class="name" id="who-name"></span>
+          <a class="btn ghost sm" href="index.html" style="text-decoration:none">Ver site</a>
+          <button class="btn ghost sm" id="logout-btn">Sair</button>
+        </div>
+      </div>
+      <nav class="tabs" id="tabs"></nav>
+    </header>
+    <main id="view"></main>
+  </div>
+
+  <dialog id="dlg"></dialog>
+
+  <script src="js/config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/tournament.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/shared.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

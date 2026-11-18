@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Copa Santa Luzia — Tabela, jogos e artilharia</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+  <!-- ENTRADA: Google ou convidado -->
+  <div id="login-screen" class="login-wrap" hidden>
+    <div class="login-card">
+      <div style="font-size:2.4rem">⚽</div>
+      <h1 id="login-title">Copa Santa Luzia</h1>
+      <p class="muted">Acompanhe tabela, jogos ao vivo, mata-mata, artilharia, cartões e suspensos.</p>
+      <div class="stack">
+        <div id="google-btn"></div>
+        <div class="sep">ou</div>
+        <button class="btn ghost" id="guest-btn">Entrar como convidado</button>
+      </div>
+      <a class="link-admin" href="admin.html">Sou administrador →</a>
+    </div>
+  </div>
+
+  <!-- APLICATIVO -->
+  <div id="app" hidden>
+    <header class="topbar">
+      <div class="topbar-in">
+        <div class="brand"><span class="ball">⚽</span><span id="app-name">Copa Santa Luzia</span></div>
+        <div class="who">
+          <img id="who-pic" alt="" hidden>
+          <span class="name" id="who-name"></span>
+          <button class="btn ghost sm" id="logout-btn">Sair</button>
+        </div>
+      </div>
+      <nav class="tabs" id="tabs"></nav>
+    </header>
+    <main id="view"></main>
+  </div>
+
+  <dialog id="dlg"></dialog>
+
+  <script src="js/config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/tournament.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/shared.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
