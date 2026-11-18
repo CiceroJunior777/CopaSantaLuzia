@@ -204,8 +204,8 @@
           <p><span class="pill green">${ok.length} serão importados</span>
           ${dup ? ` <span class="pill yellow">${dup} já cadastrados (ignorados)</span>` : ""}
           ${err ? ` <span class="pill red">${err} com erro (não serão importados)</span>` : ""}</p>
-          <div class="table-wrap" style="max-height:360px;overflow:auto"><table><thead><tr><th>Linha</th><th class="l">Clube</th><th class="l">Nome</th><th class="l">CPF</th><th>Nº</th><th class="l">Posição</th><th class="l">Situação</th></tr></thead><tbody>
-          ${prev.map(r => `<tr><td>${r.line}</td><td class="l">${esc(r.team)}</td><td class="l">${esc(r.name)}</td><td class="l">${esc(r.cpf ? Cpf.format(r.cpf) : "")}</td><td>${esc(r.number ?? "")}</td><td class="l">${esc(r.position)}</td>
+          <div class="table-wrap" style="max-height:360px;overflow:auto"><table><thead><tr><th>Linha</th><th class="l">Clube</th><th class="l">CPF</th><th class="l">Nome</th><th class="l">Posição</th><th class="l">Situação</th></tr></thead><tbody>
+          ${prev.map(r => `<tr><td>${r.line}</td><td class="l">${esc(r.team)}</td><td class="l">${esc(r.cpf ? Cpf.format(r.cpf) : "")}</td><td class="l">${esc(r.name)}</td><td class="l">${esc(r.position)}</td>
             <td class="l" style="white-space:normal">${r.status === "erro" ? `<span class="pill red">${esc(r.msg)}</span>` : r.status === "duplicado" ? '<span class="pill yellow">já cadastrado neste clube</span>'
               : r.status === "novo-clube" ? '<span class="pill green">ok · cria o clube</span>' : '<span class="pill green">ok</span>'}</td></tr>`).join("")}
           </tbody></table></div>
@@ -214,7 +214,7 @@
       }
       return `<div class="card"><h2>Importar jogadores por planilha</h2>
         <p class="muted">Envie um arquivo <strong>.xlsx</strong>, <strong>.xls</strong> ou <strong>.csv</strong> com as colunas
-        <code>Clube</code>, <code>Nome</code>, <code>CPF</code>, <code>Número</code> e <code>Posição</code> (a primeira linha é o cabeçalho).</p>
+        <code>Clube</code>, <code>CPF</code>, <code>Nome</code> e <code>Posição</code> (a primeira linha é o cabeçalho).</p>
         <ul class="muted small" style="margin:0 0 12px;padding-left:18px">
           <li>O <strong>CPF é obrigatório e único</strong>: um atleta não pode entrar em dois clubes. Linhas com CPF inválido, repetido na planilha ou já cadastrado em <em>outro</em> clube são barradas.</li>
           <li>Se o Excel tirar os zeros à esquerda do CPF, o sistema completa automaticamente.</li>
@@ -436,7 +436,7 @@
     const byCpf = new Map(D().players.filter(p => p.cpf).map(p => [p.cpf, p]));
     const seen = new Map();
     return rawRows.map((r, i) => {
-      const row = { line: i + 2, team: pick(r, "team"), name: pick(r, "name"), cpf: Cpf.norm(pick(r, "cpf")), number: int(pick(r, "number")), position: pick(r, "position"), status: "ok" };
+      const row = { line: i + 2, team: pick(r, "team"), name: pick(r, "name"), cpf: Cpf.norm(pick(r, "cpf")), position: pick(r, "position"), status: "ok" };
       if (!row.team) return { ...row, status: "erro", msg: "Clube vazio" };
       if (!row.name) return { ...row, status: "erro", msg: "Nome vazio" };
       if (!row.cpf) return { ...row, status: "erro", msg: "CPF vazio" };
@@ -465,7 +465,7 @@
         teamByName.set(norm(r.team), t);
       }
     }
-    await Store.addMany("players", ok.map(r => ({ team_id: teamByName.get(norm(r.team)).id, name: r.name, cpf: r.cpf, number: r.number, position: r.position })));
+    await Store.addMany("players", ok.map(r => ({ team_id: teamByName.get(norm(r.team)).id, name: r.name, cpf: r.cpf, position: r.position })));
     toast(ok.length + " jogador(es) importado(s)!"); importRows = null; current = "jogadores"; filterTeam = ""; q = ""; render();
   }
 
@@ -686,10 +686,9 @@
     "import-confirm": () => confirmImport(),
     "import-clear": () => { importRows = null; },
     "download-template": () => download("modelo-jogadores.csv",
-      "﻿Clube;Nome;CPF;Número;Posição\r\nTigres FC;Carlos Silva;" + Cpf.format(Cpf.make(111222333)) + ";10;Atacante\r\nTigres FC;Diego Souza;" + Cpf.format(Cpf.make(444555666)) +
-      ";1;Goleiro\r\nÁguias United;Rafael Lima;" + Cpf.format(Cpf.make(777888999)) + ";9;Atacante\r\n", "text/csv;charset=utf-8"),
-    "export-players": () => download("jogadores.csv", "﻿Clube;Nome;CPF;Número;Posição\r\n" +
-      D().players.map(p => [team(p.team_id)?.name, p.name, p.cpf ? Cpf.format(p.cpf) : "", p.number, p.position].map(csvCell).join(";")).join("\r\n"), "text/csv;charset=utf-8"),
+      "﻿Clube;CPF;Nome;Posição\r\nTigres FC;" + Cpf.format(Cpf.make(111222333)) + ";Carlos Silva;Atacante\r\nTigres FC;" + Cpf.format(Cpf.make(444555666)) + ";Diego Souza;Goleiro\r\nÁguias United;" + Cpf.format(Cpf.make(777888999)) + ";Rafael Lima;Atacante\r\n", "text/csv;charset=utf-8"),
+    "export-players": () => download("jogadores.csv", "﻿Clube;CPF;Nome;Posição\r\n" +
+      D().players.map(p => [team(p.team_id)?.name, p.cpf ? Cpf.format(p.cpf) : "", p.name, p.position].map(csvCell).join(";")).join("\r\n"), "text/csv;charset=utf-8"),
     "export-json": () => download("campeonato-backup-" + new Date().toISOString().slice(0, 10) + ".json", Store.exportJSON(), "application/json"),
     seed: async () => { if (confirm("Isso substitui os dados atuais pelos dados de exemplo. Continuar?")) { await Store.seedDemo(); toast("Dados de exemplo carregados."); } },
     "clear-all": async () => { if (confirm("Apagar TODOS os dados? Essa ação não pode ser desfeita.")) { await Store.clearAll(); toast("Dados apagados."); } }
