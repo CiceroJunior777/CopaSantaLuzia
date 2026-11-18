@@ -1,8 +1,7 @@
 /* ============================================================
-   PÁGINA DO USUÁRIO (somente leitura)
-   Classificação por grupo · Jogos (ao vivo) · Mata-mata ·
-   Artilharia · Cartões · Suspensos · Clubes/jogadores · Avisos
-   O CPF dos atletas nunca é carregado nem exibido aqui.
+   PÁGINA PÚBLICA (somente leitura)
+   Abre diretamente como visitante, sem tela ou etapa de login.
+   O painel administrativo permanece separado em admin.html.
    ============================================================ */
 (function () {
   const { esc, fmtDate, badge, empty, statusPill } = UI;
@@ -24,7 +23,6 @@
     return list;
   }
 
-  /* ---------- cartão de partida ---------- */
   function matchCard(m) {
     const h = team(m.home_id), a = team(m.away_id), st = Stats.started(m);
     const evs = D().events.filter(e => e.match_id === m.id).sort((x, y) => (x.minute || 0) - (y.minute || 0));
@@ -43,7 +41,6 @@
     </div>`;
   }
 
-  /* partida compacta do mata-mata */
   function kMatch(m) {
     const h = team(m.home_id), a = team(m.away_id), st = Stats.started(m), w = Stats.winnerOf(m);
     const line = (tm, sc, pen, id) => `<div class="kline ${w && w === id ? "win" : ""}">${badge(tm)}<span class="nm">${esc(tm?.name || "A definir")}</span>
@@ -53,7 +50,6 @@
       <div class="kmeta"><span>${fmtDate(m.date)}</span>${statusPill(m.status)}</div></div>`;
   }
 
-  /* ---------- telas ---------- */
   const views = {
     classificacao() {
       const t = T();
@@ -72,7 +68,6 @@
         `<div class="card" style="margin-top:16px"><h3>Critérios de desempate</h3><p class="muted small" style="margin:0">Em caso de empate em pontos: ${crit}.</p></div>
         <p class="muted small">P = pontos · J = jogos · V/E/D = vitórias/empates/derrotas · GP/GC = gols pró/contra · SG = saldo de gols</p>`;
     },
-
     jogos() {
       const F = { todos: () => true, ao_vivo: m => m.status === "em_andamento", proximos: m => m.status === "nao_iniciado", encerrados: m => m.status === "concluido" };
       const chips = `<div class="chips">${[["todos", "Todos"], ["ao_vivo", "🔴 Ao vivo"], ["proximos", "Não iniciados"], ["encerrados", "Concluídos"]]
@@ -95,7 +90,6 @@
       });
       return html;
     },
-
     matamata() {
       const t = T(), phases = Stats.koPhases(D()), champ = Stats.champion(D(), t.ko_byes);
       let html = "";
@@ -116,7 +110,6 @@
           `<div class="kline">${badge(team(id))}<span class="nm">${esc(team(id)?.name || "?")}</span></div>`).join("")}</div>` : ""}</div>`).join("")}</div>`;
       return html;
     },
-
     artilharia() {
       const rows = Stats.scorers(D());
       if (!rows.length) return empty("Ainda não há gols registrados.");
@@ -127,7 +120,6 @@
           <td class="l"><div class="team-cell">${badge(r.team)}${esc(r.team ? r.team.name : "")}</div></td>
           <td class="pts">${r.gols}</td></tr>`).join("")}</tbody></table></div>`;
     },
-
     cartoes() {
       const rows = Stats.cards(D());
       const hang = Stats.hanging(D(), rules.yellowsForSuspension);
@@ -142,7 +134,6 @@
           <td class="l"><div class="team-cell">${badge(r.team)}${esc(r.team ? r.team.name : "")}</div></td>
           <td>${r.amarelos}</td><td>${r.vermelhos}</td></tr>`).join("")}</tbody></table></div>`;
     },
-
     suspensos() {
       const rows = Stats.suspended(D());
       if (!rows.length) return empty("Nenhum jogador suspenso no momento. 🎉");
@@ -153,19 +144,18 @@
           <td class="l" style="white-space:normal">${esc(r.reason || "—")}</td>
           <td><span class="pill red">${esc(r.games || 1)}</span></td></tr>`).join("")}</tbody></table></div>`;
     },
-
     clubes() {
       const ts = [...D().teams].sort((a, b) => (a.grp || "").localeCompare(b.grp || "") || a.name.localeCompare(b.name));
       if (!ts.length) return empty("Nenhum clube cadastrado ainda.");
       return `<div class="grid two">${ts.map(t => {
         const n = D().players.filter(p => p.team_id === t.id).length;
         return `<div class="card"><div class="team-cell" style="margin-bottom:8px">${badge(t)}<h2 style="margin:0">${esc(t.name)}</h2>
-          ${t.grp ? `<span class="tag">Grupo ${esc(t.grp)}</span>` : ""}</div>
+          ${t.grp ? `<span class="tag">Grupo ${esc(t.grp)}</span>` : ""}
+          </div>
           <p class="muted small" style="margin:0 0 10px">${n} jogador(es)</p>
           <button class="btn ghost sm" data-roster="${t.id}">Ver jogadores</button></div>`;
       }).join("")}</div>`;
     },
-
     avisos() {
       const sorted = [...D().notes].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
       const matchNotes = D().matches.filter(m => m.notes).map(m =>
@@ -174,11 +164,10 @@
       if (!sorted.length && !matchNotes) return empty("Sem observações por enquanto.");
       return sorted.map(n => `<div class="card note"><h3>${esc(n.title || "Aviso")}</h3>
         <p style="margin:0;white-space:pre-wrap">${esc(n.text)}</p></div>`).join("") +
-        (matchNotes ? `<h2 style="margin-top:18px">Observações dos jogos</h2>${matchNotes}` : "");
+        (matchNotes ? `<h2 style="margin-top:18px">Observações dos jogos</h2>` + matchNotes : "");
     }
   };
 
-  /* ---------- navegação ---------- */
   function render() {
     const tabs = tabList();
     if (!tabs.some(([k]) => k === current)) current = tabs[0][0];
@@ -187,24 +176,13 @@
   }
 
   async function showApp() {
-    const s = Auth.session();
-    $("login-screen").hidden = true; $("app").hidden = false;
-    $("who-name").textContent = s.role === "guest" ? "Convidado" : s.role === "admin" ? "Administrador (visualizando)" : (s.name || s.email || "");
-    if (s.picture) { $("who-pic").src = s.picture; $("who-pic").hidden = false; }
+    $("app-name").textContent = CONFIG.appName;
+    $("who-name").textContent = "Acesso público";
     try { await Store.load(); render(); }
     catch (e) { $("view").innerHTML = empty("Não foi possível carregar os dados: " + e.message); }
   }
 
-  function showLogin() {
-    $("app").hidden = true; $("login-screen").hidden = false;
-    Auth.renderGoogleButton($("google-btn"), showApp);
-  }
-
   document.title = CONFIG.appName + " — Tabela, jogos e artilharia";
-  $("login-title").textContent = CONFIG.appName;
-  $("app-name").textContent = CONFIG.appName;
-  $("guest-btn").onclick = () => { Auth.guest(); showApp(); };
-  $("logout-btn").onclick = () => { Auth.logout(); location.reload(); };
   $("tabs").addEventListener("click", (e) => {
     const b = e.target.closest("[data-tab]"); if (!b) return;
     current = b.dataset.tab; render(); window.scrollTo({ top: 0 });
@@ -214,12 +192,10 @@
     jf = b.dataset.jf; render();
   });
 
-  /* atualiza sozinho (placar ao vivo) quando a página está visível */
   setInterval(async () => {
-    if ($("app").hidden || $("dlg").open || document.visibilityState !== "visible") return;
-    try { await Store.load(); render(); } catch (e) { /* tenta de novo no próximo ciclo */ }
+    if ($("dlg").open || document.visibilityState !== "visible") return;
+    try { await Store.load(); render(); } catch (e) { /* tenta novamente no próximo ciclo */ }
   }, 30000);
 
-  const s = Auth.session();
-  if (s) showApp(); else showLogin();
+  showApp();
 })();
