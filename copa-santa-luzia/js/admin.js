@@ -143,11 +143,9 @@
           ${groupBoxes ? `<div class="groups-grid">${groupBoxes}</div>` : ""}</div>
 
         <div class="card"><h2>4. Jogos da fase de grupos</h2>
-          <p class="muted small">Os confrontos e a ordem das rodadas são sorteados de forma aleatória. Modo atual: <strong>${t.legs === "ida" ? "só ida" : "ida e volta"}</strong> (altere no passo 1).
-          Depois do sorteio, edite a rodada e a data/hora de cada jogo na aba <strong>Jogos e resultados</strong>.</p>
+          <p class="muted small">O sorteio agenda até 4 jogos por dia, nos horários 08:00, 10:00, 14:00 e 16:00. Todo clube que jogar terá o dia seguinte de descanso. Modo atual: <strong>${t.legs === "ida" ? "só ida" : "ida e volta"}</strong> (altere no passo 1).</p>
           <form data-form="gen-group-matches"><div class="form-grid">
-            <label>Data e hora do 1º jogo (opcional)<input type="datetime-local" name="start"></label>
-            <label>Intervalo entre rodadas (dias)<input type="number" name="interval" min="1" value="7"></label>
+            <label>Data inicial da programação<input type="date" name="start" required></label>
             <button class="btn" ${v.ok ? "" : "disabled"}>🎲 Sortear jogos</button></div></form>
           ${v.ok ? "" : `<p class="muted small" style="margin:8px 0 0">Defina os grupos (cada um com 4 clubes) para liberar o sorteio.</p>`}</div>`
         : `<div class="card"><h2>2. Chaveamento</h2><p class="muted">Neste formato os clubes entram direto na chave. Sorteie os confrontos na aba <strong>Mata-mata</strong>.</p>
@@ -511,10 +509,11 @@
     async "gen-group-matches"(f) {
       const t = T(), v = Tournament.validateGroups(D().teams, 4);
       if (!v.ok) throw new Error(v.msg);
+      if (!f.start) throw new Error("Informe a data inicial da programação.");
       const existing = D().matches.filter(m => !Stats.isKO(m));
       if (existing.length && !confirm(`Já existem ${existing.length} jogos da fase de grupos. Sortear de novo apaga esses jogos e seus gols/cartões. Continuar?`)) return;
       await deleteGroupMatches();
-      const ms = Tournament.groupMatches(D().teams, { legs: t.legs, start: f.start || null, intervalDays: int(f.interval) || 7 });
+      const ms = Tournament.groupMatches(D().teams, { legs: t.legs, start: f.start });
       await Store.addMany("matches", ms);
       toast(`${ms.length} jogos sorteados em ${Math.max(...ms.map(m => m.round))} rodada(s).`);
     },
