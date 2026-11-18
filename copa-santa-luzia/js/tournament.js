@@ -56,9 +56,9 @@
     status: "nao_iniciado", notes: "", ...o
   });
 
-  /* Sorteia os confrontos de cada grupo e distribui por rodadas (aleatório).
-     legs: "ida" (só ida) ou "ida-volta". start/intervalDays: datas opcionais. */
-  function groupMatches(teams, { legs = "ida", start = null, intervalDays = 7 } = {}) {
+  /* Sorteia os confrontos e agenda até 4 partidas por dia.
+     Cada clube precisa descansar pelo menos um dia entre partidas. */
+  function groupMatches(teams, { legs = "ida", start = null } = {}) {
     const groups = {};
     teams.forEach(t => { if (t.grp) (groups[t.grp] = groups[t.grp] || []).push(t.id); });
     const names = Object.keys(groups).sort();
@@ -68,27 +68,45 @@
       if (legs === "ida-volta") rounds = rounds.concat(rounds.map(r => r.map(([a, b]) => [b, a])));
       per[g] = rounds;
     });
+
     const maxR = Math.max(0, ...names.map(g => per[g].length));
-    const out = [], times = ["08:00", "10:00", "14:00", "16:00"];
-    let globalRound = 0;
+    const pending = [];
     for (let r = 0; r < maxR; r++) {
-      const roundGames = [];
-      names.forEach(g => (per[g][r] || []).forEach(([h, a]) => roundGames.push({ grp: g, h, a })));
-      for (let i = 0; i < roundGames.length; i += 4) {
-        const batch = roundGames.slice(i, i + 4);
-        batch.forEach((game, slot) => {
-          let date = null;
-          if (start) {
-            const d = new Date(start);
-            d.setDate(d.getDate() + globalRound * intervalDays);
-            const [hh, mm] = times[slot].split(":").map(Number);
-            d.setHours(hh, mm, 0, 0);
-            date = fmtLocal(d);
-          }
-          out.push(baseMatch({ grp: game.grp, round: globalRound + 1, date, home_id: game.h, away_id: game.a }));
-        });
-        globalRound++;
+      names.forEach(g => (per[g][r] || []).forEach(([h, a]) => pending.push({ grp: g, h, a, round: r + 1 })));
+    }
+
+    const times = ["08:00", "10:00", "14:00", "16:00"];
+    const lastPlayed = new Map();
+    const out = [];
+    let dayOffset = 0;
+    const firstDay = start ? new Date(start.length === 10 ? start + "T00:00:00" : start) : null;
+    if (firstDay && Number.isNaN(firstDay.getTime())) throw new Error("Data inicial inválida.");
+
+    while (pending.length) {
+      const playedToday = new Set();
+      let slot = 0;
+      while (slot < times.length) {
+        const idx = pending.findIndex(game =>
+          !playedToday.has(game.h) && !playedToday.has(game.a) &&
+          lastPlayed.get(game.h) !== dayOffset - 1 &&
+          lastPlayed.get(game.a) !== dayOffset - 1
+        );
+        if (idx < 0) break;
+        const [game] = pending.splice(idx, 1);
+        let date = null;
+        if (firstDay) {
+          const d = new Date(firstDay);
+          d.setDate(d.getDate() + dayOffset);
+          const [hh, mm] = times[slot].split(":").map(Number);
+          d.setHours(hh, mm, 0, 0);
+          date = fmtLocal(d);
+        }
+        out.push(baseMatch({ grp: game.grp, round: game.round, date, home_id: game.h, away_id: game.a }));
+        playedToday.add(game.h); playedToday.add(game.a);
+        lastPlayed.set(game.h, dayOffset); lastPlayed.set(game.a, dayOffset);
+        slot++;
       }
+      if (pending.length) dayOffset++;
     }
     return out;
   }
