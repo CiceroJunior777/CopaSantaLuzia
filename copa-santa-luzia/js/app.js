@@ -60,7 +60,7 @@
         <div class="table-wrap standings-wrap"><table class="standings-table">
         <thead><tr><th class="pos-col">#</th><th class="l team-col">Clube</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th></tr></thead>
         <tbody>${g.rows.map((r, i) => `<tr class="${i < adv ? "top" : ""}">
-          <td>${i + 1}</td><td class="l team-col"><div class="team-cell standings-team">${badge(r.team)}<strong class="standings-team-name">${esc(r.team.name)}</strong></div></td>
+          <td>${i + 1}</td><td class="l team-col"><div class="team-cell standings-team">${badge(r.team)}<button class="linkbtn standings-team-name" data-team="${r.team.id}">${esc(r.team.name)}</button></div></td>
           <td class="pts">${r.p}</td><td>${r.j}</td><td>${r.v}</td><td>${r.e}</td><td>${r.d}</td>
           <td>${r.gp}</td><td>${r.gc}</td><td>${r.sg > 0 ? "+" : ""}${r.sg}</td></tr>`).join("")}</tbody></table></div>`).join("");
       const crit = t.tiebreakers.map((k, i) => `${i + 1}º ${esc(Stats.TB_INFO[k].label)}`).join(" · ");
@@ -168,6 +168,28 @@
     }
   };
 
+  function teamDialog(teamId) {
+    const t = team(teamId); if (!t) return;
+    const row = Stats.standingsByGroup(D(), rules, T().tiebreakers).flatMap(g => g.rows).find(r => r.team.id === teamId);
+    const s = row || { p:0,j:0,v:0,e:0,d:0,gp:0,gc:0,sg:0,pos:'—' };
+    const players = D().players.filter(p => p.team_id === teamId).sort((a,b) => a.name.localeCompare(b.name));
+    const matches = D().matches.filter(m => m.home_id === teamId || m.away_id === teamId).sort((a,b) => String(b.date || '').localeCompare(String(a.date || '')));
+    const scorers = Stats.scorers(D()).filter(r => r.team && r.team.id === teamId);
+    const playerRows = players.map(p => { const ps = Stats.playerSummary(D(),p.id); return `<tr><td class='l'><button class='linkbtn' data-player='${p.id}'>${esc(p.name)}</button></td><td class='l'>${esc(p.position || '—')}</td><td>${ps.gols}</td></tr>`; }).join('');
+    const scorerRows = scorers.map(r => `<tr><td class='l'><button class='linkbtn' data-player='${r.player.id}'>${esc(r.player.name)}</button></td><td class='pts'>${r.gols}</td></tr>`).join('');
+    const matchRows = matches.map(m => { const h=team(m.home_id), a=team(m.away_id), score=Stats.started(m) ? `${m.home_score ?? 0} x ${m.away_score ?? 0}` : 'vs'; const phase=Stats.isKO(m) ? (m.phase || 'Mata-mata') : `Grupo ${m.grp || t.grp || '—'} · Rodada ${m.round || '—'}`; return `<div class='team-match-row'><div><strong>${esc(h?.name || '?')} x ${esc(a?.name || '?')}</strong><div class='muted small'>${esc(phase)} · ${fmtDate(m.date)}</div></div><strong>${score}</strong><div>${statusPill(m.status)}</div></div>`; }).join('');
+    const d=$('dlg');
+    d.innerHTML = `<div class='team-detail-head'>${badge(t)}<div><h2>${esc(t.name)}</h2><p class='muted small'>${t.grp ? 'Grupo '+esc(t.grp)+' · ' : ''}${s.pos}º lugar na classificação</p></div></div>
+      <h3>Desempenho na competição</h3><div class='stats3 team-stats'>
+      <div class='stat'><b>${s.p}</b><span>Pontos</span></div><div class='stat'><b>${s.j}</b><span>Jogos</span></div><div class='stat'><b>${s.v}</b><span>Vitórias</span></div>
+      <div class='stat'><b>${s.e}</b><span>Empates</span></div><div class='stat'><b>${s.d}</b><span>Derrotas</span></div><div class='stat'><b>${s.sg > 0 ? '+' : ''}${s.sg}</b><span>Saldo de gols</span></div></div>
+      <p class='muted small'>Gols pró: <strong>${s.gp}</strong> · Gols contra: <strong>${s.gc}</strong></p>
+      <h3 style='margin-top:18px'>Jogadores (${players.length})</h3>${players.length ? `<div class='table-wrap'><table><thead><tr><th class='l'>Jogador</th><th class='l'>Posição</th><th>Gols</th></tr></thead><tbody>${playerRows}</tbody></table></div>` : empty('Nenhum jogador cadastrado neste clube.')}
+      <h3 style='margin-top:18px'>Artilheiros do clube</h3>${scorers.length ? `<div class='table-wrap'><table><thead><tr><th class='l'>Jogador</th><th>Gols</th></tr></thead><tbody>${scorerRows}</tbody></table></div>` : `<p class='muted small'>Ainda não há gols registrados.</p>`}
+      <h3 style='margin-top:18px'>Partidas (${matches.length})</h3>${matches.length ? matchRows : `<p class='muted small'>Nenhuma partida cadastrada.</p>`}
+      <div class='toolbar' style='margin:18px 0 0'><span class='spacer'></span><button class='btn ghost' data-dlgclose>Fechar</button></div>`;
+    if (!d.open) d.showModal();
+  }
   function render() {
     const tabs = tabList();
     if (!tabs.some(([k]) => k === current)) current = tabs[0][0];
@@ -188,6 +210,8 @@
     current = b.dataset.tab; render(); window.scrollTo({ top: 0 });
   });
   $("view").addEventListener("click", (e) => {
+    const club = e.target.closest("[data-team]");
+    if (club) { teamDialog(club.dataset.team); return; }
     const b = e.target.closest("[data-jf]"); if (!b) return;
     jf = b.dataset.jf; render();
   });
