@@ -685,7 +685,7 @@
     "del-note": async (b) => { if (confirm("Excluir esta observação?")) await Store.remove("notes", b.dataset.id); },
     "import-confirm": () => confirmImport(),
     "import-clear": () => { importRows = null; },
-    "download-template": () => download("modelo-jogadores.csv",
+    "download-template": () => download("modelo-jogadores-atualizado.csv",
       "﻿Clube;CPF;Nome;Posição\r\nTigres FC;" + Cpf.format(Cpf.make(111222333)) + ";Carlos Silva;Atacante\r\nTigres FC;" + Cpf.format(Cpf.make(444555666)) + ";Diego Souza;Goleiro\r\nÁguias United;" + Cpf.format(Cpf.make(777888999)) + ";Rafael Lima;Atacante\r\n", "text/csv;charset=utf-8"),
     "export-players": () => download("jogadores.csv", "﻿Clube;CPF;Nome;Posição\r\n" +
       D().players.map(p => [team(p.team_id)?.name, p.cpf ? Cpf.format(p.cpf) : "", p.name, p.position].map(csvCell).join(";")).join("\r\n"), "text/csv;charset=utf-8"),
