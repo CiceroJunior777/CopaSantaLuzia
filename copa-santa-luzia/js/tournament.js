@@ -58,22 +58,27 @@
 
   /* Sorteia os confrontos e agenda até 4 partidas por dia.
      Cada clube precisa descansar pelo menos um dia entre partidas. */
-  function groupMatches(teams, { legs = "ida", start = null } = {}) {
+  function groupMatches(teams, { legs = "ida", start = null, intervalDays = 7 } = {}) {
+    const gap = Math.max(1, Number(intervalDays) || 7);
     const groups = {};
     teams.forEach(t => { if (t.grp) (groups[t.grp] = groups[t.grp] || []).push(t.id); });
     const names = Object.keys(groups).sort();
     const per = {};
+    const roundTotals = new Map();
     names.forEach(g => {
       let rounds = roundRobin(shuffle(groups[g]));
       if (legs === "ida-volta") rounds = rounds.concat(rounds.map(r => r.map(([a, b]) => [b, a])));
       per[g] = rounds;
+      rounds.forEach((games, i) => roundTotals.set(g + "|" + (i + 1), games.length));
     });
 
-    const maxR = Math.max(0, ...names.map(g => per[g].length));
     const pending = [];
-    for (let r = 0; r < maxR; r++) {
-      names.forEach(g => (per[g][r] || []).forEach(([h, a]) => pending.push({ grp: g, h, a, round: r + 1 })));
-    }
+    const nextRound = new Map(names.map(g => [g, 1]));
+    const roundScheduled = new Map();
+    const nextRoundDay = new Map(names.map(g => [g, 0]));
+    names.forEach(g => per[g].forEach((games, i) => games.forEach(([h, a]) =>
+      pending.push({ grp: g, h, a, round: i + 1 })
+    )));
 
     const times = ["08:00", "10:00", "14:00", "16:00"];
     const lastPlayed = new Map();
@@ -87,6 +92,8 @@
       let slot = 0;
       while (slot < times.length) {
         const idx = pending.findIndex(game =>
+          game.round === nextRound.get(game.grp) &&
+          dayOffset >= nextRoundDay.get(game.grp) &&
           !playedToday.has(game.h) && !playedToday.has(game.a) &&
           lastPlayed.get(game.h) !== dayOffset - 1 &&
           lastPlayed.get(game.a) !== dayOffset - 1
@@ -104,6 +111,13 @@
         out.push(baseMatch({ grp: game.grp, round: game.round, date, home_id: game.h, away_id: game.a }));
         playedToday.add(game.h); playedToday.add(game.a);
         lastPlayed.set(game.h, dayOffset); lastPlayed.set(game.a, dayOffset);
+        const key = game.grp + "|" + game.round;
+        const count = (roundScheduled.get(key) || 0) + 1;
+        roundScheduled.set(key, count);
+        if (count === roundTotals.get(key)) {
+          nextRound.set(game.grp, game.round + 1);
+          nextRoundDay.set(game.grp, dayOffset + gap);
+        }
         slot++;
       }
       if (pending.length) dayOffset++;

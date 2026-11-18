@@ -146,6 +146,7 @@
           <p class="muted small">O sorteio agenda até 4 jogos por dia, nos horários 08:00, 10:00, 14:00 e 16:00. Todo clube que jogar terá o dia seguinte de descanso. Modo atual: <strong>${t.legs === "ida" ? "só ida" : "ida e volta"}</strong> (altere no passo 1).</p>
           <form data-form="gen-group-matches"><div class="form-grid">
             <label>Data inicial da programação<input type="date" name="start" required></label>
+            <label>Intervalo entre rodadas (dias)<input type="number" name="interval" min="1" value="7" required></label>
             <button class="btn" ${v.ok ? "" : "disabled"}>🎲 Sortear jogos</button></div></form>
           ${v.ok ? "" : `<p class="muted small" style="margin:8px 0 0">Defina os grupos (cada um com 4 clubes) para liberar o sorteio.</p>`}</div>`
         : `<div class="card"><h2>2. Chaveamento</h2><p class="muted">Neste formato os clubes entram direto na chave. Sorteie os confrontos na aba <strong>Mata-mata</strong>.</p>
@@ -513,7 +514,7 @@
       const existing = D().matches.filter(m => !Stats.isKO(m));
       if (existing.length && !confirm(`Já existem ${existing.length} jogos da fase de grupos. Sortear de novo apaga esses jogos e seus gols/cartões. Continuar?`)) return;
       await deleteGroupMatches();
-      const ms = Tournament.groupMatches(D().teams, { legs: t.legs, start: f.start });
+      const ms = Tournament.groupMatches(D().teams, { legs: t.legs, start: f.start, intervalDays: int(f.interval) || 7 });
       await Store.addMany("matches", ms);
       toast(`${ms.length} jogos sorteados em ${Math.max(...ms.map(m => m.round))} rodada(s).`);
     },
