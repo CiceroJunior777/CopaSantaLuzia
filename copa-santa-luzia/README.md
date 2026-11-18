@@ -41,7 +41,7 @@ No modo teste os dados ficam no `localStorage` do navegador.
 ### Jogadores e CPF
 - O **CPF é a chave única** do atleta (validado pelos dígitos): não pode estar em dois clubes nem repetido.
 - Só o painel mostra o CPF. No site dos usuários ele nem é carregado.
-- **Planilha:** colunas `Clube`, `Nome`, `CPF`, `Número`, `Posição` (aceita Time/Equipe, Jogador, Camisa, Pos). Baixe o modelo na aba *Importar planilha*. Linhas com CPF vazio, inválido, repetido na planilha ou já cadastrado em **outro** clube aparecem como erro na pré-visualização e não são importadas. Se o Excel tirar o zero à esquerda do CPF, o sistema completa.
+- **Planilha:** colunas `Clube`, `CPF`, `Nome`, `Posição` (aceita Time/Equipe, Jogador, Pos). Baixe o modelo na aba *Importar planilha*. Linhas com CPF vazio, inválido, repetido na planilha ou já cadastrado em **outro** clube aparecem como erro na pré-visualização e não são importadas. Se o Excel tirar o zero à esquerda do CPF, o sistema completa.
 
 ## Configuração (`js/config.js`)
 

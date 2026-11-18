@@ -218,3 +218,21 @@ td input.inl.n { width: 62px; text-align: center; }
     overflow-wrap: anywhere;
   }
 }
+
+
+/* Perfil público do clube */
+.team-detail-head { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+.team-detail-head .badge { width:44px; height:44px; font-size:.8rem; }
+.team-detail-head h2 { margin:0; }
+.team-stats { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.team-match-row { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); }
+.team-match-row:last-child { border-bottom:0; }
+.team-match-score { font-weight:800; white-space:nowrap; }
+.standings-team-name { border:0; background:none; color:var(--text); font:inherit; font-weight:800; cursor:pointer; text-align:left; text-decoration:underline dotted var(--muted); text-underline-offset:3px; }
+.standings-team-name:hover { color:var(--accent); }
+@media (max-width:560px) {
+  .team-match-row { grid-template-columns:minmax(0,1fr) auto; }
+  .team-match-row > div:last-child { grid-column:1 / -1; }
+  .team-stats { gap:6px; }
+  .team-stats .stat { padding:8px 4px; }
+}
