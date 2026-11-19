@@ -31,7 +31,7 @@
     /* Admin: usuário + senha */
     async adminLogin(username, password) {
       if (CONFIG.dataMode === "supabase") {
-        const client = Store && window.supabaseClient ? window.supabaseClient : (window.supabaseClient = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabasePublishableKey));
+        const client = window.supabaseClient || (window.supabaseClient = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabasePublishableKey));
         const email = String(username).includes("@") ? String(username).trim() : CONFIG.adminEmail;
         if (!email) throw new Error("Informe o e-mail do administrador em js/config.js ou no campo Usuário.");
         const { data, error } = await client.auth.signInWithPassword({ email, password });
