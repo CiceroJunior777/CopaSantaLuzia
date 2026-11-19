@@ -7,7 +7,7 @@
   <meta name="description" content="Conheça a Copa Santa Luzia e acompanhe as novidades no Instagram oficial.">
   <title>Sobre a competição — Copa Santa Luzia</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/sobre.css">
+  <link rel="stylesheet" href="css/sobre.css?v=20261119-3">
 </head>
 <body class="about-page">
   <header class="about-topbar">
@@ -192,11 +192,13 @@
       const next = document.querySelector('.ig-next');
       if (!track || !cards.length || !prev || !next) return;
       let active = 0;
+      let pointerStart = null;
       const render = () => {
         cards.forEach((card, index) => {
           let offset = (index - active + cards.length) % cards.length;
           if (offset > Math.floor(cards.length / 2)) offset -= cards.length;
           card.dataset.position = offset >= -2 && offset <= 2 ? String(offset) : 'hidden';
+          card.classList.toggle('is-active', offset === 0);
           card.setAttribute('aria-hidden', offset === 0 ? 'false' : 'true');
         });
       };
@@ -208,7 +210,10 @@
         if (event.key === 'ArrowRight') { event.preventDefault(); move(1); }
       });
       let pointerStart = null;
-      track.addEventListener('pointerdown', event => { pointerStart = event.clientX; });
+      track.addEventListener('pointerdown', event => {
+        pointerStart = event.clientX;
+        if (event.pointerType === 'touch' || event.pointerType === 'pen') track.setPointerCapture(event.pointerId);
+      });
       track.addEventListener('pointerup', event => {
         if (pointerStart === null) return;
         const delta = event.clientX - pointerStart;
@@ -221,28 +226,6 @@
   </script>
 
 
-  <script>
-    (() => {
-      const track = document.getElementById('igGalleryTrack');
-      const previous = document.querySelector('.ig-prev');
-      const next = document.querySelector('.ig-next');
-      if (!track || !previous || !next) return;
-      const step = () => {
-        const card = track.querySelector('.ig-card');
-        return card ? card.getBoundingClientRect().width + 20 : track.clientWidth * .8;
-      };
-      previous.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
-      next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
-      const update = () => {
-        const max = track.scrollWidth - track.clientWidth;
-        previous.disabled = track.scrollLeft <= 2;
-        next.disabled = track.scrollLeft >= max - 2;
-      };
-      track.addEventListener('scroll', update, { passive: true });
-      window.addEventListener('resize', update);
-      update();
-    })();
-  </script>
 
   <script>
     (() => {
