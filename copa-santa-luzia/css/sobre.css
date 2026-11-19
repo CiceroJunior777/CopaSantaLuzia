@@ -222,3 +222,44 @@
   height:calc(100% + 82px)!important;
   min-height:calc(100% + 82px)!important;
 }
+
+
+/* Recorte externo real do embed: esconde a faixa de perfil do Instagram. */
+.ig-deck .ig-card .ig-media-window {
+  display:block!important;
+  position:relative!important;
+  width:100%!important;
+  height:calc(100% - 28px)!important;
+  overflow:hidden!important;
+  border:0!important;
+  border-radius:7px!important;
+  background:transparent!important;
+  isolation:isolate;
+}
+.ig-deck .ig-card .ig-media-window > .instagram-media {
+  position:relative!important;
+  top:-96px!important;
+  left:0!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  height:calc(100% + 96px)!important;
+  min-height:calc(100% + 96px)!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.ig-deck .ig-card .ig-media-window iframe {
+  position:relative!important;
+  top:0!important;
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:100%!important;
+  max-width:100%!important;
+  border:0!important;
+  box-shadow:none!important;
+}
