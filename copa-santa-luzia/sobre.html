@@ -3,22 +3,102 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07140f">
+  <meta name="description" content="Conheça a Copa Santa Luzia e acompanhe as novidades no Instagram oficial.">
   <title>Sobre a competição — Copa Santa Luzia</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/sobre.css">
 </head>
-<body>
-  <header class="topbar">
-    <div class="topbar-in">
-      <div class="brand"><span class="ball">⚽</span><span>Copa Santa Luzia</span></div>
-      <div class="who"><a class="btn ghost sm" href="index.html" style="text-decoration:none">Voltar ao campeonato</a></div>
-    </div>
+<body class="about-page">
+  <header class="about-topbar">
+    <a class="about-brand" href="index.html"><span class="brand-mark">⚽</span><span>COPA <b>SANTA LUZIA</b></span></a>
+    <a class="about-back" href="index.html">Voltar ao campeonato <span aria-hidden="true">↗</span></a>
   </header>
-  <main>
-    <div class="card">
-      <h1>Sobre a competição</h1>
-      <p class="muted">A história da Copa Santa Luzia será apresentada aqui.</p>
-      <p>Em breve, este espaço contará com a trajetória da competição, sua história, momentos marcantes e outras informações que serão compartilhadas pela organização.</p>
-    </div>
+
+  <main class="about-main">
+    <section class="about-hero">
+      <div class="hero-copy reveal">
+        <span class="eyebrow"><i></i> FUTEBOL • PAIXÃO • COMUNIDADE</span>
+        <p class="hero-kicker">MAIS QUE UMA COMPETIÇÃO</p>
+        <h1>O futebol<br>nos <em>une.</em></h1>
+        <p class="hero-lead">Conheça a Copa Santa Luzia, acompanhe sua identidade e fique por dentro dos registros e novidades pelos canais oficiais.</p>
+        <div class="hero-actions">
+          <a class="about-cta" href="https://www.instagram.com/copasanta.luzia/" target="_blank" rel="noopener noreferrer">Acompanhar no Instagram <span>↗</span></a>
+          <span class="hero-handle">@copasanta.luzia</span>
+        </div>
+      </div>
+
+      <div class="hero-art reveal" aria-label="Ilustração de um campo de futebol com bola">
+        <div class="art-glow"></div>
+        <div class="stadium-lines"></div>
+        <div class="pitch">
+          <span class="pitch-half"></span><span class="pitch-circle"></span>
+          <span class="pitch-box pitch-box-left"></span><span class="pitch-box pitch-box-right"></span>
+          <span class="pitch-dot"></span>
+        </div>
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="floating-ball">⚽</div>
+        <span class="art-caption">C O P A &nbsp; S A N T A &nbsp; L U Z I A</span>
+      </div>
+      <div class="hero-index">01 <span>/</span> SOBRE</div>
+    </section>
+
+    <section class="about-intro reveal">
+      <div class="section-number">01 — A COMPETIÇÃO</div>
+      <div>
+        <h2>Uma história que<br>se constrói <em>em campo.</em></h2>
+        <p>Este é o espaço oficial para conhecer a Copa Santa Luzia. Em breve, esta apresentação será complementada com a história, os marcos e as informações institucionais compartilhadas pela organização.</p>
+      </div>
+    </section>
+
+    <section class="about-social reveal">
+      <div class="social-visual">
+        <div class="social-frame frame-back"></div>
+        <div class="social-frame frame-front">
+          <span class="insta-symbol">◎</span>
+          <strong>ACOMPANHE<br>CADA MOMENTO</strong>
+          <small>@copasanta.luzia</small>
+        </div>
+        <span class="social-orbit"></span>
+      </div>
+      <div class="social-copy">
+        <div class="section-number">02 — POR DENTRO DA COPA</div>
+        <h2>O campeonato<br>também acontece<br><em>fora das quatro linhas.</em></h2>
+        <p>Fotos, registros, novidades e conteúdos da competição ficam reunidos no perfil oficial.</p>
+        <a class="text-link" href="https://www.instagram.com/copasanta.luzia/" target="_blank" rel="noopener noreferrer">VISITAR PERFIL OFICIAL <span>↗</span></a>
+      </div>
+    </section>
+
+    <section class="about-final reveal">
+      <span class="final-kicker">COPA SANTA LUZIA</span>
+      <h2>Viva a emoção.<br><em>Faça parte.</em></h2>
+      <a class="about-cta" href="index.html">Acessar campeonato <span>↗</span></a>
+      <div class="final-watermark">CSL</div>
+    </section>
   </main>
+
+  <footer class="about-footer">
+    <span>© Copa Santa Luzia</span>
+    <a href="https://www.instagram.com/copasanta.luzia/" target="_blank" rel="noopener noreferrer">INSTAGRAM ↗</a>
+  </footer>
+
+  <script>
+    (() => {
+      const items = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window)) {
+        items.forEach(item => item.classList.add('is-visible'));
+        return;
+      }
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.14 });
+      items.forEach(item => observer.observe(item));
+    })();
+  </script>
 </body>
 </html>
