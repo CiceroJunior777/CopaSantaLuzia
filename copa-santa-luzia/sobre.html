@@ -7,7 +7,7 @@
   <meta name="description" content="Conheça a Copa Santa Luzia e acompanhe as novidades no Instagram oficial.">
   <title>Sobre a competição — Copa Santa Luzia</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/sobre.css?v=20261119-3">
+  <link rel="stylesheet" href="css/sobre.css?v=20261119-4">
 </head>
 <body class="about-page">
   <header class="about-topbar">
@@ -192,7 +192,6 @@
       const next = document.querySelector('.ig-next');
       if (!track || !cards.length || !prev || !next) return;
       let active = 0;
-      let pointerStart = null;
       const render = () => {
         cards.forEach((card, index) => {
           let offset = (index - active + cards.length) % cards.length;
