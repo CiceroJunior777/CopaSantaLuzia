@@ -223,8 +223,12 @@
   async function showApp() {
     $("app-name").textContent = CONFIG.appName;
     const who = $("who-name"); if (who) who.textContent = "";
+    /* Exibe a navegação e um estado de carregamento imediatamente, sem esperar o banco. */
+    const tabs = tabList();
+    $("tabs").innerHTML = tabs.map(([k, label]) => `<button class="tab ${k === current ? "active" : ""}" data-tab="${k}">${label}</button>`).join("");
+    $("view").innerHTML = '<div class="empty" role="status" aria-live="polite">Carregando as informações da competição...</div>';
     try { await Store.load(); render(); }
-    catch (e) { $("view").innerHTML = empty("Não foi possível carregar os dados: " + e.message); }
+    catch (e) { $("view").innerHTML = empty("Não foi possível carregar os dados. Verifique sua conexão e tente novamente."); }
   }
 
   document.title = CONFIG.appName + " — Tabela, jogos e artilharia";
