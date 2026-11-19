@@ -7,7 +7,11 @@ window.CONFIG = {
 
   /* "local" = salva no navegador (localStorage), ótimo para testar.
      "api"   = conversa com o seu backend/banco de dados (veja README.md). */
-  dataMode: "local",
+  dataMode: "supabase",
+
+  /* Chaves públicas (publishable) podem ficar no navegador. */
+  supabaseUrl: "https://cioftvnvwwpvlzogiehn.supabase.co",
+  supabasePublishableKey: "sb_publishable_XAc5gGd4wAQRbvshRrzqGQ_4y4x1vBg",
 
   /* Usado somente quando dataMode = "api".
      Endpoints esperados: GET/POST /teams, PUT/DELETE /teams/:id, POST /teams/bulk ... */
