@@ -327,3 +327,9 @@
     object-position:center;
   }
 }
+
+
+/* Estrutura flexível para manter o rodapé institucional no fim da janela */
+.about-page { min-height:100vh; display:flex; flex-direction:column; }
+.about-main { flex:1 0 auto; width:100%; }
+.site-footer { flex-shrink:0; margin-top:0; }
