@@ -108,3 +108,63 @@ create index on events (player_id);
 
 -- Exemplo: cadastrar o administrador (troque o e-mail e gere o hash com bcrypt no servidor)
 -- insert into users (email, name, role, password_hash) values ('seu@email.com', 'Admin', 'admin', '<hash-bcrypt>');
+
+
+-- ============================================================
+-- Supabase: permissões e políticas (RLS)
+-- Admin: usuário do Supabase Auth com app_metadata.role = 'admin'.
+-- Público: leitura dos dados esportivos; CPF apenas para admin.
+-- ============================================================
+
+-- A view pública deliberadamente não contém CPF.
+create or replace view players_public as
+  select id, team_id, name, number, position from players;
+
+alter table teams enable row level security;
+alter table players enable row level security;
+alter table matches enable row level security;
+alter table events enable row level security;
+alter table suspensions enable row level security;
+alter table notes enable row level security;
+alter table tournament enable row level security;
+alter table users enable row level security;
+
+-- Leitura pública dos dados não sigilosos.
+create policy "public read teams" on teams for select to anon, authenticated using (true);
+create policy "public read matches" on matches for select to anon, authenticated using (true);
+create policy "public read events" on events for select to anon, authenticated using (true);
+create policy "public read suspensions" on suspensions for select to anon, authenticated using (true);
+create policy "public read notes" on notes for select to anon, authenticated using (true);
+create policy "public read tournament" on tournament for select to anon, authenticated using (true);
+
+-- CPF e tabela completa de jogadores: somente administrador autenticado.
+create policy "admin manage players" on players for all to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+
+-- Todas as alterações exigem a role administrativa no app_metadata do JWT.
+create policy "admin manage teams" on teams for all to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+create policy "admin manage matches" on matches for all to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+create policy "admin manage events" on events for all to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+create policy "admin manage suspensions" on suspensions for all to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+create policy "admin manage notes" on notes for all to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+create policy "admin manage tournament" on tournament for all to authenticated
+  using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+  with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+
+-- Privilégios mínimos: visitantes não podem consultar a tabela players diretamente.
+grant select on teams, matches, events, suspensions, notes, tournament to anon, authenticated;
+grant select on players_public to anon, authenticated;
+grant select, insert, update, delete on teams, players, matches, events, suspensions, notes, tournament to authenticated;
+revoke all on players from anon;
+revoke all on users from anon, authenticated;
