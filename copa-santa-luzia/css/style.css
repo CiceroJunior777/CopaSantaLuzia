@@ -283,3 +283,19 @@ td input.inl.n { width: 62px; text-align: center; }
 /* Logomarca oficial da Copa Santa Luzia */
 .brand .brand-logo { width:36px; height:46px; object-fit:contain; flex:none; display:block; }
 @media (max-width:560px) { .admin-topbar .brand .brand-logo { width:30px; height:40px; } }
+
+
+/* Escudo oficial do Buriti EC nos identificadores dos clubes */
+.badge.badge-image {
+  overflow:hidden;
+  padding:0;
+  background:transparent!important;
+  border:1px solid rgba(255,255,255,.16);
+}
+.badge.badge-image img {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  border-radius:inherit;
+}
