@@ -65,7 +65,46 @@
     async clearAll() { throw new Error("Limpar tudo não é permitido via API pelo painel."); }
   };
 
-  const adapter = () => (CONFIG.dataMode === "api" ? RestAdapter : LocalAdapter);
+  /* ---------- Adaptador 3: Supabase ---------- */
+  const SupabaseAdapter = {
+    client() {
+      if (!window.supabaseClient) {
+        if (!window.supabase || !CONFIG.supabaseUrl || !CONFIG.supabasePublishableKey) {
+          throw new Error("Supabase não configurado. Confira js/config.js e a biblioteca supabase-js.");
+        }
+        window.supabaseClient = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabasePublishableKey);
+      }
+      return window.supabaseClient;
+    },
+    table(c) { return c === "players" && !Store.keepCpf ? "players_public" : c; },
+    async list(c) {
+      const { data, error } = await this.client().from(this.table(c)).select("*");
+      if (error) throw error;
+      return data || [];
+    },
+    async create(c, obj) {
+      const { data, error } = await this.client().from(c).insert(obj).select("*").single();
+      if (error) throw error;
+      return data;
+    },
+    async bulkCreate(c, arr) {
+      const { data, error } = await this.client().from(c).insert(arr).select("*");
+      if (error) throw error;
+      return data || [];
+    },
+    async update(c, id, patch) {
+      const { data, error } = await this.client().from(c).update(patch).eq("id", id).select("*").single();
+      if (error) throw error;
+      return data;
+    },
+    async remove(c, id) {
+      const { error } = await this.client().from(c).delete().eq("id", id);
+      if (error) throw error;
+    },
+    async clearAll() { throw new Error("Limpeza total desativada no Supabase para evitar apagar dados de produção."); }
+  };
+
+  const adapter = () => (CONFIG.dataMode === "api" ? RestAdapter : CONFIG.dataMode === "supabase" ? SupabaseAdapter : LocalAdapter);
   const LEGACY_STATUS = { agendado: "nao_iniciado", encerrado: "concluido" };
 
   const Store = {
