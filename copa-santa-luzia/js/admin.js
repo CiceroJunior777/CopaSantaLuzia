@@ -74,7 +74,7 @@
     });
     zoomControl.addEventListener("input",()=>{zoom=Number(zoomControl.value);draw();});
     canvas.addEventListener("pointerdown",e=>{if(!img)return;dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);});
-    canvas.addEventListener("pointermove",e=>{if(!dragging)return;offsetX+=e.clientX-lastX;offsetY+=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;draw();});
+    canvas.addEventListener("pointermove",e=>{if(!dragging)return;const factor=size/canvas.getBoundingClientRect().width;offsetX+=(e.clientX-lastX)*factor;offsetY+=(e.clientY-lastY)*factor;lastX=e.clientX;lastY=e.clientY;draw();});
     canvas.addEventListener("pointerup",()=>{dragging=false;});
     canvas.addEventListener("pointercancel",()=>{dragging=false;});
     draw();
