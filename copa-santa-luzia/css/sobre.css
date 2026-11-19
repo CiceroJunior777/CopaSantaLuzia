@@ -189,3 +189,21 @@
 @media(max-width:760px) {
  .ig-deck .ig-card[data-position="0"] { transform:translate(-50%,-50%) scale(1.06); }
 }
+
+
+/* Remove o fundo e a moldura branca do embed do Instagram nos cards da galeria */
+.ig-card .instagram-media,
+.ig-deck .ig-card .instagram-media {
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  padding:0!important;
+  outline:0!important;
+}
+.ig-card .instagram-media iframe,
+.ig-deck .ig-card .instagram-media iframe {
+  border:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+}
