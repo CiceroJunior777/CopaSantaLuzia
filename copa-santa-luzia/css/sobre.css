@@ -92,7 +92,7 @@
 .edition-card p { position:relative; max-width:440px; color:#a9b9ae; line-height:1.8; font-size:.9rem; }
 .edition-foot { display:block; position:relative; margin-top:28px; color:#80978a; font-size:.65rem; font-weight:900; letter-spacing:.16em; }
 .champion-feature { display:grid; grid-template-columns:auto 1fr auto; gap:35px; align-items:center; position:relative; overflow:hidden; padding:45px clamp(24px,5vw,65px); margin:0 0 115px; border:1px solid rgba(183,243,107,.35); background:radial-gradient(circle at 15% 50%,rgba(183,243,107,.14),transparent 32%),linear-gradient(110deg,#142c1e,#0a1911); }
-.champion-crown { width:76px; height:76px; display:grid; place-items:center; border:1px solid rgba(183,243,107,.4); border-radius:50%; color:var(--about-green); font-size:2.7rem; animation:crownPulse 4s ease-in-out infinite; }
+.champion-crown { width:76px; height:76px; box-sizing:border-box; display:block; object-fit:contain; padding:9px; border:1px solid rgba(183,243,107,.4); border-radius:50%; animation:crownPulse 4s ease-in-out infinite; }
 .champion-copy h2 { margin:0; font-size:clamp(3rem,6vw,5.5rem); line-height:.9; letter-spacing:-.07em; }
 .champion-copy h2 em { color:var(--about-green); font-style:normal; }
 .champion-copy > p:last-child { max-width:590px; color:#a9b9ae; line-height:1.8; }
@@ -105,7 +105,7 @@
  .edition-grid { grid-template-columns:1fr; }
  .edition-card { min-height:300px; padding:28px; }
  .champion-feature { grid-template-columns:auto 1fr; gap:18px; padding:28px 22px; margin-bottom:80px; }
- .champion-crown { width:55px; height:55px; font-size:2rem; }
+ .champion-crown { width:55px; height:55px; padding:6px; }
  .champion-copy { min-width:0; }
  .champion-copy .section-number { line-height:1.6; }
  .champion-stamp { grid-column:2; justify-self:start; }
