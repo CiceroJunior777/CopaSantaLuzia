@@ -74,12 +74,14 @@
       const groupMatches = allMatches.filter(m => !Stats.isKO(m));
       const rounds = [...new Set(D().matches.filter(m => !Stats.isKO(m)).map(m => Number(m.round) || 0))].filter(Boolean).sort((a,b) => a-b);
       if (!rounds.some(r => String(r) === String(jr))) jr = "todas";
-      const roundFilter = rounds.length ? `<div class="toolbar" style="margin:10px 0 14px;gap:10px;align-items:center">
+      const roundFilter = `<div class="toolbar" style="margin:10px 0 14px;gap:10px;align-items:center">
         <label class="muted small" for="round-filter">Visualizar rodada:</label>
-        <select id="round-filter" class="input" style="max-width:220px">
-          <option value="todas" ${jr === "todas" ? "selected" : ""}>Todas as rodadas</option>
-          ${rounds.map(r => `<option value="${r}" ${String(jr) === String(r) ? "selected" : ""}>Rodada ${r}</option>`).join("")}
-        </select></div>` : "";
+        <select id="round-filter" class="input" style="max-width:220px" ${rounds.length ? "" : "disabled"}>
+          ${rounds.length
+            ? `<option value="todas" ${jr === "todas" ? "selected" : ""}>Todas as rodadas</option>
+              ${rounds.map(r => `<option value="${r}" ${String(jr) === String(r) ? "selected" : ""}>Rodada ${r}</option>`).join("")}`
+            : '<option value="todas">Nenhuma rodada cadastrada</option>'}
+        </select></div>`;
       const chips = `<div class="chips">${[["todos", "Todos"], ["ao_vivo", "🔴 Ao vivo"], ["proximos", "Não iniciados"], ["encerrados", "Concluídos"]]
         .map(([k, l]) => `<button class="chip ${jf === k ? "active" : ""}" data-jf="${k}">${l}</button>`).join("")}</div>`;
       const ms = allMatches;
