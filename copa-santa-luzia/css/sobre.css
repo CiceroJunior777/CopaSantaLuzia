@@ -3,7 +3,7 @@
 .about-topbar { height:76px; padding:0 clamp(20px,6vw,90px); display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.09); position:relative; z-index:5; background:rgba(7,20,15,.88); }
 .about-brand { display:flex; align-items:center; gap:12px; color:#f4f7f2; text-decoration:none; font-size:.78rem; letter-spacing:.2em; }
 .about-brand b { color:var(--about-green); }
-.brand-mark { display:grid; place-items:center; width:38px; height:38px; border:1px solid rgba(183,243,107,.5); border-radius:50%; font-size:19px; }
+.brand-mark { display:block; width:34px; height:46px; object-fit:contain; flex:none; }
 .about-back { color:#d6e0d8; text-decoration:none; font-size:.8rem; font-weight:700; }
 .about-back span,.text-link span { color:var(--about-green); margin-left:8px; }
 .about-main { max-width:1440px; margin:auto; padding:0 clamp(20px,7vw,110px); }
