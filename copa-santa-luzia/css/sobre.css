@@ -263,3 +263,26 @@
   border:0!important;
   box-shadow:none!important;
 }
+
+
+/* Fotos enviadas para a galeria da Copa Santa Luzia */
+.ig-deck .ig-card .ig-media-window { display:none!important; }
+.ig-deck .ig-card .ig-photo-link {
+  display:block;
+  position:relative;
+  width:100%;
+  height:calc(100% - 36px);
+  overflow:hidden;
+  border-radius:7px;
+  background:#07170d;
+}
+.ig-deck .ig-card .ig-photo {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  border:0;
+  border-radius:7px;
+}
+.ig-deck .ig-card-top span:first-child { color:var(--about-green); }
