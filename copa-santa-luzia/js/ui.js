@@ -10,9 +10,14 @@
       d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
   };
 
-  const badge = (team) => team
-    ? `<span class="badge" style="background:${esc(team.color || "#64748b")}">${esc((team.short || team.name).slice(0, 3).toUpperCase())}</span>`
-    : "";
+  const badge = (team) => {
+    if (!team) return "";
+    const teamName = String(team.name || "").normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase();
+    if (teamName.includes("buriti")) {
+      return `<span class="badge badge-image"><img src="assets/Buriti-ec.png" alt="Escudo Buriti EC" loading="lazy"></span>`;
+    }
+    return `<span class="badge" style="background:${esc(team.color || "#64748b")}">${esc((team.short || team.name).slice(0, 3).toUpperCase())}</span>`;
+  };
 
   let toastTimer;
   const toast = (msg, isError) => {
