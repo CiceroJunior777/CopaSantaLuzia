@@ -299,3 +299,37 @@ td input.inl.n { width: 62px; text-align: center; }
   object-fit:contain;
   border-radius:inherit;
 }
+
+
+/* Escudo do Buriti EC: usa a imagem real do clube em vez do emblema genérico */
+.badge.badge-image.badge-buriti {
+  width:44px!important;
+  height:44px!important;
+  min-width:44px;
+  border:0!important;
+  border-radius:9px!important;
+  padding:0!important;
+  overflow:hidden;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.badge.badge-image.badge-buriti img {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+  border:0;
+  border-radius:inherit;
+  background:transparent;
+}
+.standings-team .badge.badge-image.badge-buriti {
+  width:30px!important;
+  height:30px!important;
+  min-width:30px;
+}
+.team-detail-head .badge.badge-image.badge-buriti {
+  width:58px!important;
+  height:58px!important;
+  min-width:58px;
+}
