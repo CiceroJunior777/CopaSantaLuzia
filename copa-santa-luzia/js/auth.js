@@ -30,7 +30,17 @@
 
     /* Admin: usuário + senha */
     async adminLogin(username, password) {
-      if (CONFIG.dataMode === "supabase") {\n        const client = Store && window.supabaseClient ? window.supabaseClient : (window.supabaseClient = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabasePublishableKey));\n        const email = String(username).includes("@") ? String(username).trim() : CONFIG.adminEmail;\n        if (!email) throw new Error("Informe o e-mail do administrador em js/config.js ou no campo Usuário.");\n        const { data, error } = await client.auth.signInWithPassword({ email, password });\n        if (error) return false;\n        if (!data.user || !data.user.app_metadata || data.user.app_metadata.role !== "admin") { await client.auth.signOut(); throw new Error("Esta conta não possui permissão de administrador no Supabase."); }\n        this.set({ role: "admin", name: data.user.user_metadata?.name || email, email, token: data.session.access_token });\n        return true;\n      }\n      if (CONFIG.dataMode === "api") {
+      if (CONFIG.dataMode === "supabase") {
+        const client = Store && window.supabaseClient ? window.supabaseClient : (window.supabaseClient = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabasePublishableKey));
+        const email = String(username).includes("@") ? String(username).trim() : CONFIG.adminEmail;
+        if (!email) throw new Error("Informe o e-mail do administrador em js/config.js ou no campo Usuário.");
+        const { data, error } = await client.auth.signInWithPassword({ email, password });
+        if (error) return false;
+        if (!data.user || !data.user.app_metadata || data.user.app_metadata.role !== "admin") { await client.auth.signOut(); throw new Error("Esta conta não possui permissão de administrador no Supabase."); }
+        this.set({ role: "admin", name: data.user.user_metadata?.name || email, email, token: data.session.access_token });
+        return true;
+      }
+      if (CONFIG.dataMode === "api") {
         // O servidor valida e devolve { token, email }
         const res = await fetch(CONFIG.apiBaseUrl + "/auth/admin", {
           method: "POST", headers: { "Content-Type": "application/json" },
