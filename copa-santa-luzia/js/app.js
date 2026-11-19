@@ -11,7 +11,7 @@
   const T = () => Store.tournament();
   const team = (id) => Store.get("teams", id);
   const player = (id) => Store.get("players", id);
-  let current = "classificacao", jf = "todos";
+  let current = "classificacao", jf = "todos", jr = "todas";
 
   function tabList() {
     const t = T();
@@ -70,24 +70,45 @@
     },
     jogos() {
       const F = { todos: () => true, ao_vivo: m => m.status === "em_andamento", proximos: m => m.status === "nao_iniciado", encerrados: m => m.status === "concluido" };
+      const allMatches = D().matches.filter(F[jf]);
+      const groupMatches = allMatches.filter(m => !Stats.isKO(m));
+      const rounds = [...new Set(D().matches.filter(m => !Stats.isKO(m)).map(m => Number(m.round) || 0))].filter(Boolean).sort((a,b) => a-b);
+      if (!rounds.some(r => String(r) === String(jr))) jr = "todas";
+      const roundFilter = rounds.length ? `<div class="toolbar" style="margin:10px 0 14px;gap:10px;align-items:center">
+        <label class="muted small" for="round-filter">Visualizar rodada:</label>
+        <select id="round-filter" class="input" style="max-width:220px">
+          <option value="todas" ${jr === "todas" ? "selected" : ""}>Todas as rodadas</option>
+          ${rounds.map(r => `<option value="${r}" ${String(jr) === String(r) ? "selected" : ""}>Rodada ${r}</option>`).join("")}
+        </select></div>` : "";
       const chips = `<div class="chips">${[["todos", "Todos"], ["ao_vivo", "🔴 Ao vivo"], ["proximos", "Não iniciados"], ["encerrados", "Concluídos"]]
         .map(([k, l]) => `<button class="chip ${jf === k ? "active" : ""}" data-jf="${k}">${l}</button>`).join("")}</div>`;
-      const ms = D().matches.filter(F[jf]);
-      if (!ms.length) return chips + empty(D().matches.length ? "Nenhum jogo nesta categoria." : "Nenhum jogo cadastrado ainda.");
+      const ms = allMatches;
+      if (!ms.length) return chips + roundFilter + empty(D().matches.length ? "Nenhum jogo nesta categoria." : "Nenhum jogo cadastrado ainda.");
       const cmp = (a, b) => (a.round || 0) - (b.round || 0) || String(a.date).localeCompare(String(b.date));
       const live = ms.filter(m => m.status === "em_andamento");
       const rest = jf === "todos" ? ms.filter(m => m.status !== "em_andamento") : ms;
-      let html = chips;
-      if (jf === "todos" && live.length) html += `<h2>🔴 Ao vivo agora</h2>` + live.map(matchCard).join("");
-      const gm = rest.filter(m => !Stats.isKO(m)).sort(cmp);
-      [...new Set(gm.map(m => m.round || 0))].forEach(r => {
-        html += `<h2 style="margin-top:14px">${r ? "Rodada " + r : "Jogos"}</h2>` + gm.filter(m => (m.round || 0) === r).map(matchCard).join("");
-      });
+      const filteredGroups = rest.filter(m => !Stats.isKO(m) && (jr === "todas" || String(m.round || 0) === String(jr))).sort(cmp);
       const km = rest.filter(Stats.isKO);
-      [...new Set(km.map(m => m.phase_no || 1))].sort((a, b) => a - b).forEach(n => {
-        const list = km.filter(m => (m.phase_no || 1) === n);
-        html += `<h2 style="margin-top:14px">${esc(list[0].phase || "Mata-mata")}</h2>` + list.map(matchCard).join("");
-      });
+      let html = chips + roundFilter;
+      if (jf === "todos" && live.length) {
+        const liveVisible = live.filter(m => Stats.isKO(m) || jr === "todas" || String(m.round || 0) === String(jr));
+        if (liveVisible.length) html += `<h2>🔴 Ao vivo agora</h2>` + liveVisible.map(matchCard).join("");
+      }
+      if (filteredGroups.length) {
+        const byRound = [...new Set(filteredGroups.map(m => m.round || 0))];
+        byRound.forEach(r => {
+          const games = filteredGroups.filter(m => (m.round || 0) === r);
+          html += `<h2 style="margin-top:14px">${r ? "Rodada " + r : "Jogos"}</h2>` + games.map(matchCard).join("");
+        });
+      } else if (groupMatches.length && !km.length) {
+        html += empty(jr === "todas" ? "Nenhum jogo da fase de grupos nesta categoria." : `Nenhum jogo da Rodada ${jr} nesta categoria.`);
+      }
+      if (km.length) {
+        [...new Set(km.map(m => m.phase_no || 1))].sort((a, b) => a - b).forEach(n => {
+          const list = km.filter(m => (m.phase_no || 1) === n);
+          html += `<h2 style="margin-top:14px">${esc(list[0].phase || "Mata-mata")}</h2>` + list.map(matchCard).join("");
+        });
+      }
       return html;
     },
     matamata() {
@@ -199,7 +220,7 @@
 
   async function showApp() {
     $("app-name").textContent = CONFIG.appName;
-    $("who-name").textContent = "Acesso público";
+    const who = $("who-name"); if (who) who.textContent = "";
     try { await Store.load(); render(); }
     catch (e) { $("view").innerHTML = empty("Não foi possível carregar os dados: " + e.message); }
   }
@@ -212,11 +233,14 @@
   $("view").addEventListener("click", (e) => {
     const club = e.target.closest("[data-team]");
     if (club) { teamDialog(club.dataset.team); return; }
-    const b = e.target.closest("[data-jf]"); if (!b) return;
-    jf = b.dataset.jf; render();
+    const b = e.target.closest("[data-jf]");
+    if (b) { jf = b.dataset.jf; render(); return; }
   });
 
-  setInterval(async () => {
+  $("view").addEventListener("change", (e) => {
+    if (e.target.id === "round-filter") { jr = e.target.value; render(); }
+  });
+\n  setInterval(async () => {
     if ($("dlg").open || document.visibilityState !== "visible") return;
     try { await Store.load(); render(); } catch (e) { /* tenta novamente no próximo ciclo */ }
   }, 30000);
