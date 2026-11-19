@@ -240,7 +240,8 @@
   $("view").addEventListener("change", (e) => {
     if (e.target.id === "round-filter") { jr = e.target.value; render(); }
   });
-\n  setInterval(async () => {
+
+  setInterval(async () => {
     if ($("dlg").open || document.visibilityState !== "visible") return;
     try { await Store.load(); render(); } catch (e) { /* tenta novamente no próximo ciclo */ }
   }, 30000);
