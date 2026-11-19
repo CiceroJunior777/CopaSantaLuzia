@@ -25,7 +25,8 @@ create table teams (
   id         uuid primary key default gen_random_uuid(),
   name       text not null unique,
   short      text,                      -- sigla (3 letras)
-  color      text default '#64748b',    -- cor do escudo
+  color      text default '#64748b',    -- cor legada/opcional
+  logo       text,                      -- escudo do clube em data URL WebP
   grp        text                       -- grupo (A, B, C...)
 );
 

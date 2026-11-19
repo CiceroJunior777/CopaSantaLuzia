@@ -12,13 +12,17 @@
 
   const badge = (team) => {
     if (!team) return "";
+    if (team.logo) {
+      return '<span class="badge badge-image"><img src="' + esc(team.logo) + '" alt="Escudo ' + esc(team.name || "clube") + '" loading="lazy"></span>';
+    }
     const identity = [team.name, team.short].filter(Boolean).join(" ")
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .normalize("NFD").replace(/[\\u0300-\\u036f]/g, "")
       .toLowerCase().replace(/[^a-z0-9]/g, "");
     if (identity.includes("buriti")) {
-      return `<span class="badge badge-image badge-buriti"><img src="assets/Buriti-ec.png" alt="Escudo Buriti EC" loading="eager"></span>`;
+      return '<span class="badge badge-image"><img src="assets/Buriti-ec.png" alt="Escudo Buriti EC" loading="lazy"></span>';
     }
-    return `<span class="badge" style="background:${esc(team.color || "#64748b")}">${esc((team.short || team.name).slice(0, 3).toUpperCase())}</span>`;
+    return '<span class="badge badge-initials" style="--team-badge-color:' + esc(team.color || "#64748b") + '">' +
+      esc((team.short || team.name).slice(0, 3).toUpperCase()) + '</span>';
   };
 
   let toastTimer;

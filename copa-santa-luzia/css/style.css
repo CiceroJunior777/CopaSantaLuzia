@@ -333,3 +333,25 @@ td input.inl.n { width: 62px; text-align: center; }
   height:58px!important;
   min-width:58px;
 }
+
+
+/* Escudos personalizados dos clubes e editor de recorte circular */
+.badge.badge-image { overflow:hidden; padding:0; background:transparent!important; border:1px solid rgba(255,255,255,.14); }
+.badge.badge-image img { display:block; width:100%; height:100%; object-fit:contain; object-position:center; border-radius:inherit; }
+.badge.badge-initials { background:var(--team-badge-color,#64748b); }
+.logo-editor { display:grid; gap:12px; }
+.logo-editor h2 { margin:0; }
+.logo-file-label { display:inline-flex; align-items:center; gap:12px; width:max-content; max-width:100%; }
+.logo-file-label input { max-width:230px; font-size:.78rem; }
+.logo-crop-stage { display:grid; place-items:center; padding:8px; }
+#team-logo-canvas {
+  width:min(72vw,320px); height:auto; aspect-ratio:1; border-radius:50%;
+  border:3px solid rgba(134,239,172,.75);
+  box-shadow:0 0 0 8px rgba(34,197,94,.08),0 12px 35px rgba(0,0,0,.3);
+  cursor:grab; touch-action:none; background:#17251d;
+}
+#team-logo-canvas:active { cursor:grabbing; }
+.logo-zoom-label { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:14px; }
+.logo-zoom-label input { padding:0; accent-color:var(--accent); }
+.logo-hint { text-align:center; margin:0; }
+.logo-actions { justify-content:flex-end; flex-wrap:wrap; }
