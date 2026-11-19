@@ -98,3 +98,18 @@ js/app.js       página do usuário
 js/admin.js     painel do administrador
 db/schema.sql
 ```
+
+
+## Integração Supabase
+
+O projeto agora possui adaptador direto para Supabase (`supabase-js`), usando a chave pública configurada em `js/config.js`. Para ativar:
+
+1. No painel do Supabase, abra **SQL Editor** e execute o arquivo `db/schema.sql` completo em um projeto novo (ou revise as alterações antes de aplicar em um banco que já contenha dados).
+2. Em **Authentication → Users**, crie o usuário do administrador.
+3. Em **Authentication → Users → (usuário) → Raw App Meta Data**, defina `role` como `admin` (ou atribua a role por um processo administrativo seguro). O valor deve ficar em `app_metadata`, nunca em `user_metadata`.
+4. Informe o e-mail administrativo em `CONFIG.adminEmail` no arquivo `js/config.js` se quiser permitir que o campo Usuário aceite apenas o nome de usuário.
+5. Publique o site. O login do painel usa e-mail/senha do Supabase Auth; os visitantes leem dados esportivos sem autenticação.
+
+**Proteção de CPF:** o site público consulta somente `players_public`, sem CPF. A tabela `players` é restrita à role `admin` por RLS. Nunca use `service_role` no navegador.
+
+**Atenção:** a aplicação não migra automaticamente os dados antigos do `localStorage`. Antes de mudar dados reais, faça backup na aba *Dados e banco* e importe/migre os dados com o administrador autenticado. O SQL não deve ser executado por cima de dados existentes sem revisão.
