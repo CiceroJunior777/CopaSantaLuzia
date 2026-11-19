@@ -170,3 +170,22 @@
  .ig-deck .ig-carousel-arrow { width:34px; height:34px; }
 }
 @media(prefers-reduced-motion:reduce) { .ig-deck .ig-card { transition:none; } }
+
+/* Destaque mais forte do card ativo ao avançar ou deslizar */
+.ig-deck .ig-card { will-change:transform,opacity,filter; backface-visibility:hidden; filter:brightness(.68) saturate(.72); }
+.ig-deck .ig-card[data-position="0"] {
+  filter:brightness(1.08) saturate(1.12);
+  transform:translate(-50%,-50%) scale(1.1);
+  border-color:rgba(183,243,107,.9);
+  box-shadow:0 0 0 1px rgba(183,243,107,.22),0 24px 70px rgba(0,0,0,.62),0 0 42px rgba(132,220,77,.2);
+}
+.ig-deck .ig-card[data-position="-1"], .ig-deck .ig-card[data-position="1"] { filter:brightness(.78) saturate(.82); }
+.ig-deck .ig-card[data-position="-2"], .ig-deck .ig-card[data-position="2"] { filter:brightness(.55) saturate(.65); }
+.ig-deck .ig-card.is-active .ig-card-top { color:#d0ff8b; text-shadow:0 0 12px rgba(183,243,107,.35); }
+/* O gesto deve ser capturado pelo carrossel, não pelo iframe externo do Instagram. */
+.ig-deck .ig-card .instagram-media, .ig-deck .ig-card .instagram-media iframe { pointer-events:none!important; }
+.ig-deck .ig-gallery-grid { cursor:grab; }
+.ig-deck .ig-gallery-grid:active { cursor:grabbing; }
+@media(max-width:760px) {
+ .ig-deck .ig-card[data-position="0"] { transform:translate(-50%,-50%) scale(1.06); }
+}
