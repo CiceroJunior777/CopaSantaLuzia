@@ -207,3 +207,18 @@
   box-shadow:none!important;
   background:transparent!important;
 }
+
+
+/* Recorta o cabeçalho do perfil do Instagram dentro dos cards,
+   mantendo somente a área visual da publicação. */
+.ig-deck .ig-card .instagram-media {
+  position:relative!important;
+  overflow:hidden!important;
+  clip-path:inset(0);
+}
+.ig-deck .ig-card .instagram-media iframe {
+  position:relative!important;
+  top:-82px!important;
+  height:calc(100% + 82px)!important;
+  min-height:calc(100% + 82px)!important;
+}
