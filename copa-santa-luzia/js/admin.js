@@ -78,6 +78,11 @@
     canvas.addEventListener("pointerup",()=>{dragging=false;});
     canvas.addEventListener("pointercancel",()=>{dragging=false;});
     draw();
+    if (t.logo) {
+      const existing = new Image();
+      existing.onload = () => { img = existing; zoomControl.disabled = false; save.disabled = false; draw(); };
+      existing.src = t.logo;
+    }
     save.addEventListener("click",async()=>{
       if(!img){toast("Escolha uma imagem primeiro.",true);return;}
       const output=document.createElement("canvas");output.width=output.height=512;
