@@ -278,3 +278,8 @@ td input.inl.n { width: 62px; text-align: center; }
     padding-left: 10px;
   }
 }
+
+
+/* Logomarca oficial da Copa Santa Luzia */
+.brand .brand-logo { width:36px; height:46px; object-fit:contain; flex:none; display:block; }
+@media (max-width:560px) { .admin-topbar .brand .brand-logo { width:30px; height:40px; } }
