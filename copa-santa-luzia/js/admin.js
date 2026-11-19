@@ -534,7 +534,6 @@
   async function confirmImport() {
     const ok = importRows.filter(r => r.status === "ok" || r.status === "novo-clube");
     const teamByName = new Map(D().teams.map(t => [norm(t.name), t]));
-    const palette = ["#22c55e", "#38bdf8", "#f97316", "#a855f7", "#ef4444", "#eab308", "#14b8a6", "#ec4899"];
     for (const r of ok) {
       if (!teamByName.has(norm(r.team))) {
         const t = await Store.add("teams", { name: r.team, short: r.team.slice(0, 3).toUpperCase(), grp: "" });
