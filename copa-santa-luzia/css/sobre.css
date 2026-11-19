@@ -286,3 +286,13 @@
   border-radius:7px;
 }
 .ig-deck .ig-card-top span:first-child { color:var(--about-green); }
+
+
+/* Exibe a imagem inteira dentro do card, sem cortar nenhuma parte */
+.ig-deck .ig-card .ig-photo-link {
+  background:rgba(0,0,0,.22)!important;
+}
+.ig-deck .ig-card .ig-photo {
+  object-fit:contain!important;
+  object-position:center!important;
+}
