@@ -34,6 +34,66 @@
   const sortedTeams = () => [...D().teams].sort((a, b) => a.name.localeCompare(b.name));
   const openDialog = (html) => { const d = $("dlg"); d.innerHTML = html; if (!d.open) d.showModal(); };
   const closeDialog = () => { const d = $("dlg"); if (d.open) d.close(); };
+
+  function openTeamLogoEditor(teamId) {
+    const t = team(teamId);
+    if (!t) return;
+    openDialog("<div class='logo-editor'><h2>" + (t.logo ? "Alterar escudo" : "Adicionar escudo") + " · " + esc(t.name) + "</h2>" +
+      "<p class='muted small'>Escolha uma imagem. Arraste para posicionar e use o zoom até enquadrar como deseja.</p>" +
+      "<label class='logo-file-label'>Escolher imagem<input id='team-logo-file' type='file' accept='image/*'></label>" +
+      "<div class='logo-crop-stage'><canvas id='team-logo-canvas' width='320' height='320'></canvas></div>" +
+      "<label class='logo-zoom-label'>Zoom <input id='team-logo-zoom' type='range' min='1' max='3' step='0.01' value='1' disabled></label>" +
+      "<p class='muted small logo-hint'>A prévia circular representa como o escudo aparecerá no site.</p>" +
+      "<div class='row-actions logo-actions'><button class='btn ghost' type='button' data-act='close'>Cancelar</button>" +
+      (t.logo ? "<button class='btn danger' type='button' id='team-logo-remove'>Remover logo</button>" : "") +
+      "<button class='btn' type='button' id='team-logo-save' disabled>Salvar escudo</button></div></div>");
+    const canvas = $("team-logo-canvas"), ctx = canvas.getContext("2d");
+    const file = $("team-logo-file"), zoomControl = $("team-logo-zoom"), save = $("team-logo-save"), size = canvas.width;
+    let img = null, zoom = 1, offsetX = 0, offsetY = 0, dragging = false, lastX = 0, lastY = 0;
+    const baseScale = () => Math.max(size / img.width, size / img.height);
+    const dimensions = () => ({ w: img.width * baseScale() * zoom, h: img.height * baseScale() * zoom });
+    const clamp = () => {
+      const d = dimensions();
+      offsetX = Math.max(-(d.w - size) / 2, Math.min((d.w - size) / 2, offsetX));
+      offsetY = Math.max(-(d.h - size) / 2, Math.min((d.h - size) / 2, offsetY));
+    };
+    const draw = () => {
+      ctx.clearRect(0, 0, size, size);
+      if (!img) { ctx.fillStyle = "#17251d"; ctx.fillRect(0,0,size,size); ctx.fillStyle = "#9ca3af"; ctx.font = "15px system-ui"; ctx.textAlign = "center"; ctx.fillText("Escolha uma imagem",size/2,size/2); return; }
+      clamp(); const d = dimensions();
+      ctx.fillStyle = "#101a14"; ctx.fillRect(0,0,size,size);
+      ctx.drawImage(img,(size-d.w)/2+offsetX,(size-d.h)/2+offsetY,d.w,d.h);
+    };
+    file.addEventListener("change", () => {
+      const selected = file.files && file.files[0]; if (!selected) return;
+      if (!selected.type.startsWith("image/")) { toast("Escolha um arquivo de imagem.",true); return; }
+      if (selected.size > 12*1024*1024) { toast("A imagem deve ter no máximo 12 MB.",true); file.value=""; return; }
+      const url=URL.createObjectURL(selected), next=new Image();
+      next.onload=()=>{ if(img && img.src.startsWith("blob:")) URL.revokeObjectURL(img.src); img=next; zoom=1; offsetX=0; offsetY=0; zoomControl.value="1"; zoomControl.disabled=false; save.disabled=false; draw(); };
+      next.onerror=()=>toast("Não foi possível abrir essa imagem.",true); next.src=url;
+    });
+    zoomControl.addEventListener("input",()=>{zoom=Number(zoomControl.value);draw();});
+    canvas.addEventListener("pointerdown",e=>{if(!img)return;dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);});
+    canvas.addEventListener("pointermove",e=>{if(!dragging)return;offsetX+=e.clientX-lastX;offsetY+=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;draw();});
+    canvas.addEventListener("pointerup",()=>{dragging=false;});
+    canvas.addEventListener("pointercancel",()=>{dragging=false;});
+    draw();
+    save.addEventListener("click",async()=>{
+      if(!img){toast("Escolha uma imagem primeiro.",true);return;}
+      const output=document.createElement("canvas");output.width=output.height=512;
+      const out=output.getContext("2d"),d=dimensions(),ratio=512/size;
+      out.drawImage(img,((size-d.w)/2+offsetX)*ratio,((size-d.h)/2+offsetY)*ratio,d.w*ratio,d.h*ratio);
+      try{await Store.update("teams",teamId,{logo:output.toDataURL("image/webp",0.84)});closeDialog();render();toast("Escudo do clube salvo.");}
+      catch(err){toast(err.message||"Não foi possível salvar o escudo.",true);}
+    });
+    const remove=$("team-logo-remove");
+    if(remove)remove.addEventListener("click",async()=>{
+      if(!confirm("Remover o escudo deste clube?"))return;
+      try{await Store.update("teams",teamId,{logo:null});closeDialog();render();toast("Escudo removido.");}
+      catch(err){toast(err.message||"Não foi possível remover o escudo.",true);}
+    });
+  }
+
   const download = (name, text, mime) => {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([text], { type: mime || "text/plain;charset=utf-8" }));
@@ -51,7 +111,6 @@
     <div class="form-grid">
       <label>Nome do clube*<input name="name" required value="${esc(t.name || "")}" placeholder="Ex.: Tigres FC"></label>
       <label>Sigla<input name="short" maxlength="4" value="${esc(t.short || "")}" placeholder="TIG"></label>
-      <label>Cor<input type="color" name="color" value="${esc(t.color || "#22c55e")}"></label>
       <label>Grupo<input name="grp" maxlength="2" value="${esc(t.grp || "")}" placeholder="A"></label>
       <button class="btn">${t.id ? "Salvar" : "Adicionar clube"}</button>
     </div></form>`;
@@ -162,6 +221,7 @@
           <td>${esc(t.short || "—")}</td><td>${esc(t.grp || "—")}</td>
           <td>${D().players.filter(p => p.team_id === t.id).length}</td>
           <td><div class="row-actions"><button class="btn sm" data-roster="${t.id}">Ver jogadores</button>
+          <button class="btn ghost sm" data-act="logo-team" data-id="${t.id}">${t.logo ? "Alterar logo" : "Adicionar logo"}</button>
           <button class="btn ghost sm" data-act="edit-team" data-id="${t.id}">Editar</button>
           <button class="btn danger sm" data-act="del-team" data-id="${t.id}">Excluir</button></div></td></tr>`).join("")}
         </tbody></table></div>` : ""}`;
@@ -472,7 +532,7 @@
     const palette = ["#22c55e", "#38bdf8", "#f97316", "#a855f7", "#ef4444", "#eab308", "#14b8a6", "#ec4899"];
     for (const r of ok) {
       if (!teamByName.has(norm(r.team))) {
-        const t = await Store.add("teams", { name: r.team, short: r.team.slice(0, 3).toUpperCase(), color: palette[D().teams.length % palette.length], grp: "" });
+        const t = await Store.add("teams", { name: r.team, short: r.team.slice(0, 3).toUpperCase(), grp: "" });
         teamByName.set(norm(r.team), t);
       }
     }
@@ -561,7 +621,7 @@
     async team(f) {
       if (!f.name.trim()) throw new Error("Informe o nome do clube.");
       if (D().teams.some(t => norm(t.name) === norm(f.name) && t.id !== f.id)) throw new Error("Já existe um clube com esse nome.");
-      const data = { name: f.name.trim(), short: (f.short || f.name.slice(0, 3)).toUpperCase(), color: f.color, grp: f.grp.trim().toUpperCase() };
+      const data = { name: f.name.trim(), short: (f.short || f.name.slice(0, 3)).toUpperCase(), grp: (f.grp || "").trim().toUpperCase() };
       f.id ? await Store.update("teams", f.id, data) : await Store.add("teams", data);
       toast("Clube salvo."); closeDialog();
     },
@@ -636,6 +696,7 @@
   const actions = {
     close: () => closeDialog(),
     "edit-team": (b) => openDialog(`<h2>Editar clube</h2>${teamForm(team(b.dataset.id))}`),
+    "logo-team": (b) => openTeamLogoEditor(b.dataset.id),
     "del-team": async (b) => {
       const t = team(b.dataset.id);
       if (confirm(`Excluir "${t.name}" e TODOS os seus jogadores, jogos e eventos?`)) { await Store.removeTeam(t.id); toast("Clube excluído."); }
