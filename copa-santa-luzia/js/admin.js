@@ -219,7 +219,19 @@
           <li>Se o Excel tirar os zeros à esquerda do CPF, o sistema completa automaticamente.</li>
           <li>Clubes que ainda não existem são criados automaticamente.</li></ul>
         <div class="dz"><input type="file" id="import-file" accept=".xlsx,.xls,.csv,.txt"></div>
-        <div class="toolbar" style="margin:12px 0 0"><button class="btn ghost sm" data-act="download-template">⬇ Baixar modelo de planilha (CSV)</button></div></div>${preview}`;
+        <div class="toolbar" style="margin:12px 0 0"><button class="btn ghost sm" data-act="download-template">⬇ Baixar modelo de planilha (CSV)</button></div></div>
+        <div class="card"><h2>Cadastrar jogador manualmente</h2>
+          <p class="muted small">Preencha os mesmos dados da planilha: clube, CPF e nome do jogador. O CPF deve ser válido e não pode estar cadastrado em outro clube.</p>
+          <form data-form="player">
+            <div class="form-grid">
+              <label>Clube*<select name="team_id" required>${teamOptions("", false)}</select></label>
+              <label>CPF*<input name="cpf" required inputmode="numeric" maxlength="14" placeholder="000.000.000-00"></label>
+              <label>Nome do jogador*<input name="name" required placeholder="Nome completo"></label>
+              <button class="btn" ${D().teams.length ? "" : "disabled"}>Cadastrar jogador</button>
+            </div>
+          </form>
+          ${D().teams.length ? "" : '<p class="muted small">Cadastre um clube primeiro na aba Clubes para poder vincular o jogador.</p>'}
+        </div>${preview}`;
     },
 
     /* ============ JOGOS ============ */
@@ -559,7 +571,7 @@
       if (!Cpf.valid(cpf)) throw new Error("CPF inválido. Confira os 11 dígitos.");
       const dup = D().players.find(p => p.cpf === cpf && p.id !== f.id);
       if (dup) throw new Error(`Este CPF já está cadastrado em "${team(dup.team_id)?.name || "?"}" (${dup.name}). Um atleta não pode estar em dois clubes.`);
-      const data = { team_id: f.team_id, name: f.name.trim(), cpf, number: int(f.number), position: f.position.trim() };
+      const data = { team_id: f.team_id, name: f.name.trim(), cpf, number: int(f.number), position: (f.position || "").trim() };
       f.id ? await Store.update("players", f.id, data) : await Store.add("players", data);
       toast("Jogador salvo."); closeDialog();
     },
