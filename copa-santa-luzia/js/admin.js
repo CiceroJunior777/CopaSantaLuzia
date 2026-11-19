@@ -778,8 +778,10 @@
     $("login-err").textContent = "";
     try {
       if (await Auth.adminLogin(f.username.trim(), f.password)) showApp();
-      else $("login-err").textContent = "Usuário ou senha incorretos.";
-    } catch (err) { $("login-err").textContent = "Erro ao entrar: " + err.message; }
+      else $("login-err").textContent = "Não foi possível entrar. Confira seu e-mail e sua senha e tente novamente.";
+    } catch (err) {
+      $("login-err").textContent = err.message || "Não foi possível concluir o acesso. Tente novamente em instantes.";
+    }
   });
 
   if (Auth.isAdmin()) showApp(); else $("login-screen").hidden = false;
