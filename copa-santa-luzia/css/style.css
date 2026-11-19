@@ -371,3 +371,10 @@ td input.inl.n { width: 62px; text-align: center; }
 .footer-links a:hover,.footer-bottom a:hover { color:#fff; text-decoration:underline; }
 .footer-bottom { display:flex; justify-content:space-between; align-items:center; gap:14px; padding-top:16px; border-top:1px solid rgba(255,255,255,.1); color:#789080; font-size:.72rem; }
 @media(max-width:560px) { .site-footer { margin-top:48px; } .site-footer-inner { width:calc(100% - 32px); padding-top:30px; } .footer-bottom { align-items:flex-start; flex-direction:column; } }
+
+
+/* Rodapé no fim da janela quando o conteúdo não ocupa toda a altura */
+html, body { min-height:100%; }
+body { min-height:100vh; display:flex; flex-direction:column; }
+#app { flex:1 0 auto; }
+.site-footer { flex-shrink:0; margin-top:0; }
