@@ -147,6 +147,8 @@
             <a href="https://www.instagram.com/p/DVHNL7MmUQ2/" target="_blank" rel="noopener noreferrer">Ver publicação oficial da Copa Santa Luzia no Instagram</a>
           </blockquote>
         </article>
+        </div>
+        <button class="ig-carousel-arrow ig-next" type="button" aria-label="Próxima publicação">›</button>
       </div>
     </section>
 
@@ -182,6 +184,42 @@
   </footer>
 
   <script async src="https://www.instagram.com/embed.js"></script>
+  <script>
+    (() => {
+      const track = document.getElementById('igGalleryTrack');
+      const cards = track ? [...track.querySelectorAll('.ig-card')] : [];
+      const prev = document.querySelector('.ig-prev');
+      const next = document.querySelector('.ig-next');
+      if (!track || !cards.length || !prev || !next) return;
+      let active = 0;
+      const render = () => {
+        cards.forEach((card, index) => {
+          let offset = (index - active + cards.length) % cards.length;
+          if (offset > Math.floor(cards.length / 2)) offset -= cards.length;
+          card.dataset.position = offset >= -2 && offset <= 2 ? String(offset) : 'hidden';
+          card.setAttribute('aria-hidden', offset === 0 ? 'false' : 'true');
+        });
+      };
+      const move = delta => { active = (active + delta + cards.length) % cards.length; render(); };
+      prev.addEventListener('click', () => move(-1));
+      next.addEventListener('click', () => move(1));
+      track.addEventListener('keydown', event => {
+        if (event.key === 'ArrowLeft') { event.preventDefault(); move(-1); }
+        if (event.key === 'ArrowRight') { event.preventDefault(); move(1); }
+      });
+      let pointerStart = null;
+      track.addEventListener('pointerdown', event => { pointerStart = event.clientX; });
+      track.addEventListener('pointerup', event => {
+        if (pointerStart === null) return;
+        const delta = event.clientX - pointerStart;
+        if (Math.abs(delta) > 35) move(delta < 0 ? 1 : -1);
+        pointerStart = null;
+      });
+      track.addEventListener('pointercancel', () => { pointerStart = null; });
+      render();
+    })();
+  </script>
+
 
   <script>
     (() => {
