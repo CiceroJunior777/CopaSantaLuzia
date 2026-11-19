@@ -113,7 +113,9 @@
     keepCpf: false,   // só o painel do administrador liga isto
 
     async load() {
-      for (const c of COLLECTIONS) this.data[c] = await adapter().list(c);
+      /* Busca todas as coleções ao mesmo tempo: reduz a espera acumulada no Supabase. */
+      const results = await Promise.all(COLLECTIONS.map(c => adapter().list(c)));
+      COLLECTIONS.forEach((c, i) => { this.data[c] = results[i]; });
       /* compatibilidade com dados antigos */
       this.data.matches.forEach(m => {
         if (LEGACY_STATUS[m.status]) m.status = LEGACY_STATUS[m.status];
