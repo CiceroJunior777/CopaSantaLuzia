@@ -131,37 +131,37 @@
     if (!window.jspdf || !window.jspdf.jsPDF) throw new Error("Não foi possível carregar o gerador de PDF. Verifique sua conexão e tente novamente.");
 
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-    const pageW = 297, pageH = 210, margin = 8, tableW = pageW - margin * 2;
-    const cols = [18, 137, 76, 50];
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const pageW = 210, pageH = 297, margin = 8, tableW = pageW - margin * 2;
+    const cols = [12, 82, 57, 41];
     const logo = await rosterLogoData();
     const drawHeader = () => {
       if (logo) {
-        doc.addImage(logo, "PNG", margin + 2, 6, 31, 31, undefined, "FAST");
-        doc.addImage(logo, "PNG", pageW - margin - 33, 6, 31, 31, undefined, "FAST");
+        doc.addImage(logo, "PNG", margin + 1, 5, 22, 22, undefined, "FAST");
+        doc.addImage(logo, "PNG", pageW - margin - 23, 5, 22, 22, undefined, "FAST");
       }
       doc.setTextColor(15, 15, 15);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(18);
-      doc.text("COPA SANTA LUZIA DE FUTEBOL", pageW / 2, 14, { align: "center" });
-      doc.setFontSize(10);
-      doc.text("Rua Manoel José Vitorino, Sítio Lagoa – Barbalha – Ceará", pageW / 2, 21, { align: "center" });
+      doc.setFontSize(15);
+      doc.text("COPA SANTA LUZIA DE FUTEBOL", pageW / 2, 13, { align: "center" });
+      doc.setFontSize(8.5);
+      doc.text("Rua Manoel José Vitorino, Sítio Lagoa – Barbalha – Ceará", pageW / 2, 19, { align: "center" });
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(13);
-      doc.text("CAMPEONATO DE FUTEBOL AMADOR MASCULINO 2026", pageW / 2, 31, { align: "center" });
-      doc.setFontSize(16);
-      doc.text("RELAÇÃO DE ATLETAS", pageW / 2, 46, { align: "center" });
+      doc.setFontSize(10.5);
+      doc.text("CAMPEONATO DE FUTEBOL AMADOR MASCULINO 2026", pageW / 2, 27, { align: "center" });
+      doc.setFontSize(14);
+      doc.text("RELAÇÃO DE ATLETAS", pageW / 2, 39, { align: "center" });
 
-      let metaY = 58;
+      let metaY = 47;
       const meta = (label, value) => {
-        const h = 7;
+        const h = 7, labelW = 48;
         doc.setLineWidth(0.25);
-        doc.rect(margin, metaY, 63, h);
-        doc.rect(margin + 63, metaY, tableW - 63, h);
+        doc.rect(margin, metaY, labelW, h);
+        doc.rect(margin + labelW, metaY, tableW - labelW, h);
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(10);
+        doc.setFontSize(9);
         doc.text(label, margin + 1.2, metaY + 4.8);
-        if (value) doc.text(value, margin + 63 + (tableW - 63) / 2, metaY + 4.8, { align: "center" });
+        if (value) doc.text(value, margin + labelW + (tableW - labelW) / 2, metaY + 4.8, { align: "center" });
         metaY += h;
       };
       meta("NOME DO CLUBE:", t.name.toLocaleUpperCase("pt-BR"));
@@ -169,7 +169,7 @@
       const labels = ["N°", "NOME DO ATLETA", "DOC. IDENTIFICAÇÃO", "N° ATLETA"];
       let x = margin;
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(10);
+      doc.setFontSize(8.5);
       labels.forEach((label, i) => {
         doc.rect(x, metaY, cols[i], 7);
         doc.text(label, x + cols[i] / 2, metaY + 4.8, { align: "center" });
@@ -179,11 +179,10 @@
     };
 
     let y = drawHeader();
-    // Mantém a relação inteira em uma única folha A4 horizontal.
-    // A quantidade de atletas altera apenas a altura das linhas.
-    const availableH = pageH - 7 - y;
-    const rowH = availableH / athletes.length;
-    const fontSize = Math.max(6, Math.min(9, rowH * 1.45));
+    // A4 vertical: linhas compactas e proporcionais, sem esticar quando há poucos atletas.
+    const availableH = pageH - 10 - y;
+    const rowH = Math.min(9, availableH / athletes.length);
+    const fontSize = Math.max(5.5, Math.min(8, rowH * 0.78));
     athletes.forEach((p, index) => {
       let x = margin;
       const values = [
@@ -196,8 +195,8 @@
         doc.rect(x, y, cols[i], rowH);
         doc.setFont("helvetica", "normal");
         doc.setFontSize(fontSize);
-        const text = i === 1 ? doc.splitTextToSize(value, cols[i] - 3)[0] : value;
-        doc.text(text, i === 1 ? x + 2 : x + cols[i] / 2, y + rowH / 2 + fontSize * 0.12, i === 1 ? {} : { align: "center" });
+        const cellText = i === 1 ? doc.splitTextToSize(value, cols[i] - 3)[0] : value;
+        doc.text(cellText, i === 1 ? x + 2 : x + cols[i] / 2, y + rowH / 2 + fontSize * 0.12, i === 1 ? {} : { align: "center" });
         x += cols[i];
       });
       y += rowH;
@@ -339,13 +338,13 @@
       const term = norm(q), termDigits = Cpf.clean(q);
       const ps = D().players.filter(p => (!filterTeam || p.team_id === filterTeam) &&
         (!term || norm(p.name).includes(term) || (termDigits && (p.cpf || "").includes(termDigits))))
-        .sort((a, b) => (team(a.team_id)?.name || "").localeCompare(team(b.team_id)?.name || "") || (a.number ?? 999) - (b.number ?? 999));
+        .sort((a, b) => (team(a.team_id)?.name || "").localeCompare(team(b.team_id)?.name || "") || a.name.localeCompare(b.name, "pt-BR"));
       return `<div class="toolbar"><select data-filter="team">${teamOptions(filterTeam, true)}</select>
           <input data-filter="q" placeholder="Buscar por nome ou CPF" value="${esc(q)}">
           <span class="muted small">${ps.length} jogador(es)</span><span class="spacer"></span>
           <button class="btn ghost sm" data-act="export-players">Exportar CSV</button></div>
         ${ps.length ? `<div class="table-wrap"><table><thead><tr><th>Nº</th><th class="l">Jogador</th><th class="l">CPF</th><th class="l">Clube</th><th>⚽</th><th>🟨</th><th>🟥</th><th></th></tr></thead><tbody>
-        ${ps.map(p => { const s = Stats.playerSummary(D(), p.id); return `<tr><td>${esc(p.number ?? "")}</td>
+        ${ps.map((p, index) => { const s = Stats.playerSummary(D(), p.id); return `<tr><td>${String(index + 1).padStart(2, "0")}</td>
           <td class="l"><button class="linkbtn" data-player="${p.id}">${esc(p.name)}</button></td>
           <td class="l">${p.cpf ? esc(Cpf.format(p.cpf)) : '<span class="pill red">sem CPF</span>'}</td>
           <td class="l"><div class="team-cell">${badge(team(p.team_id))}${esc(team(p.team_id)?.name || "")}</div></td>
