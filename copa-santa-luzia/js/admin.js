@@ -340,10 +340,7 @@
       const ps = D().players.filter(p => (!filterTeam || p.team_id === filterTeam) &&
         (!term || norm(p.name).includes(term) || (termDigits && (p.cpf || "").includes(termDigits))))
         .sort((a, b) => (team(a.team_id)?.name || "").localeCompare(team(b.team_id)?.name || "") || (a.number ?? 999) - (b.number ?? 999));
-      return `<div class="card"><h2>Novo jogador</h2>${playerForm()}
-        <p class="muted small" style="margin:10px 0 0">O <strong>CPF</strong> é a chave única do atleta: o mesmo CPF não pode estar em dois clubes. Ele só aparece aqui no painel, nunca no site dos usuários.
-        Para cadastrar vários de uma vez, use a aba <strong>Adicionar jogador</strong>.</p></div>
-        <div class="toolbar"><select data-filter="team">${teamOptions(filterTeam, true)}</select>
+      return `<div class="toolbar"><select data-filter="team">${teamOptions(filterTeam, true)}</select>
           <input data-filter="q" placeholder="Buscar por nome ou CPF" value="${esc(q)}">
           <span class="muted small">${ps.length} jogador(es)</span><span class="spacer"></span>
           <button class="btn ghost sm" data-act="export-players">Exportar CSV</button></div>

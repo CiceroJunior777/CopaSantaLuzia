@@ -20,8 +20,8 @@
       .sort((a, b) => (a.number ?? 999) - (b.number ?? 999) || a.name.localeCompare(b.name));
     const rows = ps.map(p => ({ p, s: Stats.playerSummary(D(), p.id) }));
     const tot = rows.reduce((a, r) => ({ g: a.g + r.s.gols, y: a.y + r.s.amarelos, r: a.r + r.s.vermelhos }), { g: 0, y: 0, r: 0 });
-    const body = rows.map(({ p, s }) => `<tr>
-        <td>${esc(p.number ?? "")}</td>
+    const body = rows.map(({ p, s }, index) => `<tr>
+        <td>${String(index + 1).padStart(2, "0")}</td>
         <td class="l"><button class="linkbtn" data-player="${p.id}">${esc(p.name)}</button></td>
         ${admin ? `<td class="l">${p.cpf ? esc(Cpf.format(p.cpf)) : '<span class="pill red">sem CPF</span>'}</td>` : ""}
         <td class="l">${esc(p.position || "")}</td><td>${s.gols}</td><td>${s.amarelos}</td><td>${s.vermelhos}</td>
