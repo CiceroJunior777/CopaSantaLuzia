@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/sobre.css?v=20261119-8">
 </head>
-<body class="about-page">
+<body id="top" class="about-page">
   <header class="about-topbar">
     <a class="about-brand" href="index.html"><img class="brand-mark" src="assets/Emblema%20Copa%20Santa%20Luzia%20em%20PNG%20transparente.png" alt="Logomarca Copa Santa Luzia"><span>COPA <b>SANTA LUZIA</b></span></a>
     <a class="about-back" href="index.html">Voltar ao campeonato <span aria-hidden="true">↗</span></a>
@@ -77,12 +77,12 @@
     </section>
 
     <section class="champion-feature reveal">
-      <div class="champion-crown">♛</div>
+      <img class="champion-crown" src="assets/Buriti-ec.png" alt="Escudo do Buriti EC, atual campeão">
       <div class="champion-copy">
         <span class="section-number">03 — QUEM ESCREVEU SEU NOME NA HISTÓRIA</span>
         <p class="champion-label">ATUAL CAMPEÃO</p>
         <h2>BURITI <em>EC</em></h2>
-        <p>O Buriti EC é o atual campeão da Copa Santa Luzia. Uma conquista que passa a fazer parte da trajetória da competição e merece seu lugar de destaque nesta história.</p>
+        <p>O Buriti EC fez história ao conquistar o título nas duas edições da Copa Santa Luzia. Bicampeão da competição, o clube marcou seu nome nesta trajetória e se tornou o grande destaque das duas primeiras edições.</p>
       </div>
       <div class="champion-stamp">CAMPEÃO<br><b>CSL</b></div>
     </section>
@@ -169,12 +169,28 @@
     </section>
   </main>
 
-  <footer class="about-footer">
-    <span>© Copa Santa Luzia</span>
-    <a href="https://www.instagram.com/copasanta.luzia/" target="_blank" rel="noopener noreferrer">INSTAGRAM ↗</a>
-  </footer>
 
   <script async src="https://www.instagram.com/embed.js"></script>
+  <footer class="site-footer">
+  <div class="site-footer-inner">
+    <div class="footer-topline">
+      <a class="footer-brand" href="index.html" aria-label="Copa Santa Luzia - início">
+        <img src="assets/Emblema%20Copa%20Santa%20Luzia%20em%20PNG%20transparente.png" alt="">
+        <span><strong>COPA SANTA LUZIA</strong><small>Futebol, paixão e comunidade.</small></span>
+      </a>
+      <p class="footer-message">Uma competição feita por pessoas que acreditam na força do esporte e da nossa comunidade.</p>
+    </div>
+    <nav class="footer-links" aria-label="Links do rodapé">
+      <a href="index.html">Campeonato</a>
+      <a href="sobre.html">Sobre a competição</a>
+      <a class="footer-instagram" href="https://www.instagram.com/copasanta.luzia/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.6" cy="6.7" r="1.1" fill="currentColor"/></svg>
+        Instagram
+      </a>
+    </nav>
+    <div class="footer-bottom"><span>© <span class="footer-year">2026</span> Copa Santa Luzia. Todos os direitos reservados.</span><a href="#top">Voltar ao topo ↑</a></div>
+  </div>
+</footer>
   <script>
     (() => {
       const track = document.getElementById('igGalleryTrack');
