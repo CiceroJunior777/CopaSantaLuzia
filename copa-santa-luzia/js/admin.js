@@ -133,7 +133,7 @@
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const pageW = 210, pageH = 297, margin = 8, tableW = pageW - margin * 2;
-    const cols = [12, 82, 57, 41];
+    const cols = [12, 82, 57, 43];
     const logo = await rosterLogoData();
     const drawHeader = () => {
       if (logo) {
