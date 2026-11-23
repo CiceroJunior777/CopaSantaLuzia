@@ -198,7 +198,7 @@
     const players = D().players.filter(p => p.team_id === teamId).sort((a,b) => a.name.localeCompare(b.name));
     const matches = D().matches.filter(m => m.home_id === teamId || m.away_id === teamId).sort((a,b) => String(b.date || '').localeCompare(String(a.date || '')));
     const scorers = Stats.scorers(D()).filter(r => r.team && r.team.id === teamId);
-    const playerRows = players.map(p => { const ps = Stats.playerSummary(D(),p.id); return `<tr><td class='l'><button class='linkbtn' data-player='${p.id}'>${esc(p.name)}</button></td><td>${ps.gols}</td></tr>`; }).join('');
+    const playerRows = players.map(p => { const ps = Stats.playerSummary(D(),p.id); return `<tr><td class='l'><button class='linkbtn' data-player='${p.id}'>${esc(p.name)}</button></td><td class='l'>${esc(p.position || '—')}</td><td>${ps.gols}</td></tr>`; }).join('');
     const scorerRows = scorers.map(r => `<tr><td class='l'><button class='linkbtn' data-player='${r.player.id}'>${esc(r.player.name)}</button></td><td class='pts'>${r.gols}</td></tr>`).join('');
     const matchRows = matches.map(m => { const h=team(m.home_id), a=team(m.away_id), score=Stats.started(m) ? `${m.home_score ?? 0} x ${m.away_score ?? 0}` : 'vs'; const phase=Stats.isKO(m) ? (m.phase || 'Mata-mata') : `Grupo ${m.grp || t.grp || '—'} · Rodada ${m.round || '—'}`; return `<div class='team-match-row'><div><strong>${esc(h?.name || '?')} x ${esc(a?.name || '?')}</strong><div class='muted small'>${esc(phase)} · ${fmtDate(m.date)}</div></div><strong>${score}</strong><div>${statusPill(m.status)}</div></div>`; }).join('');
     const d=$('dlg');
@@ -207,7 +207,7 @@
       <div class='stat'><b>${s.p}</b><span>Pontos</span></div><div class='stat'><b>${s.j}</b><span>Jogos</span></div><div class='stat'><b>${s.v}</b><span>Vitórias</span></div>
       <div class='stat'><b>${s.e}</b><span>Empates</span></div><div class='stat'><b>${s.d}</b><span>Derrotas</span></div><div class='stat'><b>${s.sg > 0 ? '+' : ''}${s.sg}</b><span>Saldo de gols</span></div></div>
       <p class='muted small'>Gols pró: <strong>${s.gp}</strong> · Gols contra: <strong>${s.gc}</strong></p>
-      <h3 style='margin-top:18px'>Jogadores (${players.length})</h3>${players.length ? `<div class='table-wrap'><table><thead><tr><th class='l'>Jogador</th><th>Gols</th></tr></thead><tbody>${playerRows}</tbody></table></div>` : empty('Nenhum jogador cadastrado neste clube.')}
+      <h3 style='margin-top:18px'>Jogadores (${players.length})</h3>${players.length ? `<div class='table-wrap'><table><thead><tr><th class='l'>Jogador</th><th class='l'>Posição</th><th>Gols</th></tr></thead><tbody>${playerRows}</tbody></table></div>` : empty('Nenhum jogador cadastrado neste clube.')}
       <h3 style='margin-top:18px'>Artilheiros do clube</h3>${scorers.length ? `<div class='table-wrap'><table><thead><tr><th class='l'>Jogador</th><th>Gols</th></tr></thead><tbody>${scorerRows}</tbody></table></div>` : `<p class='muted small'>Ainda não há gols registrados.</p>`}
       <h3 style='margin-top:18px'>Partidas (${matches.length})</h3>${matches.length ? matchRows : `<p class='muted small'>Nenhuma partida cadastrada.</p>`}
       <div class='toolbar' style='margin:18px 0 0'><span class='spacer'></span><button class='btn ghost' data-dlgclose>Fechar</button></div>`;
