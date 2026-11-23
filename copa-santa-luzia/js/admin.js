@@ -179,9 +179,12 @@
     };
 
     let y = drawHeader();
-    const rowH = 5.8;
+    // Mantém a relação inteira em uma única folha A4 horizontal.
+    // A quantidade de atletas altera apenas a altura das linhas.
+    const availableH = pageH - 7 - y;
+    const rowH = availableH / athletes.length;
+    const fontSize = Math.max(6, Math.min(9, rowH * 1.45));
     athletes.forEach((p, index) => {
-      if (y + rowH > pageH - 7) { doc.addPage(); y = drawHeader(); }
       let x = margin;
       const values = [
         String(index + 1).padStart(2, "0"),
@@ -192,9 +195,9 @@
       values.forEach((value, i) => {
         doc.rect(x, y, cols[i], rowH);
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
+        doc.setFontSize(fontSize);
         const text = i === 1 ? doc.splitTextToSize(value, cols[i] - 3)[0] : value;
-        doc.text(text, i === 1 ? x + 2 : x + cols[i] / 2, y + 4, i === 1 ? {} : { align: "center" });
+        doc.text(text, i === 1 ? x + 2 : x + cols[i] / 2, y + rowH / 2 + fontSize * 0.12, i === 1 ? {} : { align: "center" });
         x += cols[i];
       });
       y += rowH;
