@@ -344,12 +344,12 @@
           <input data-filter="q" placeholder="Buscar por nome ou CPF" value="${esc(q)}">
           <span class="muted small">${ps.length} jogador(es)</span><span class="spacer"></span>
           <button class="btn ghost sm" data-act="export-players">Exportar CSV</button></div>
-        ${ps.length ? `<div class="table-wrap"><table><thead><tr><th>Nº</th><th class="l">Jogador</th><th class="l">CPF</th><th class="l">Clube</th><th>⚽</th><th>🟨</th><th>🟥</th><th></th></tr></thead><tbody>
+        ${ps.length ? `<div class="table-wrap"><table><thead><tr><th>Nº</th><th class="l">Jogador</th><th class="l">CPF</th><th class="l">Clube</th><th class="l">Posição</th><th>⚽</th><th>🟨</th><th>🟥</th><th></th></tr></thead><tbody>
         ${ps.map(p => { const s = Stats.playerSummary(D(), p.id); return `<tr><td>${esc(p.number ?? "")}</td>
           <td class="l"><button class="linkbtn" data-player="${p.id}">${esc(p.name)}</button></td>
           <td class="l">${p.cpf ? esc(Cpf.format(p.cpf)) : '<span class="pill red">sem CPF</span>'}</td>
           <td class="l"><div class="team-cell">${badge(team(p.team_id))}${esc(team(p.team_id)?.name || "")}</div></td>
-          <td>${s.gols}</td><td>${s.amarelos}</td><td>${s.vermelhos}</td>
+          <td class="l">${esc(p.position || "")}</td><td>${s.gols}</td><td>${s.amarelos}</td><td>${s.vermelhos}</td>
           <td><div class="row-actions"><button class="btn ghost sm" data-act="edit-player" data-id="${p.id}">Editar</button>
           <button class="btn danger sm" data-act="del-player" data-id="${p.id}">Excluir</button></div></td></tr>`; }).join("")}
         </tbody></table></div>` : empty("Nenhum jogador encontrado.")}`;
