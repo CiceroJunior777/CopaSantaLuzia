@@ -344,7 +344,7 @@
           <span class="muted small">${ps.length} jogador(es)</span><span class="spacer"></span>
           <button class="btn ghost sm" data-act="export-players">Exportar CSV</button></div>
         ${ps.length ? `<div class="table-wrap"><table><thead><tr><th>Nº</th><th class="l">Jogador</th><th class="l">CPF</th><th class="l">Clube</th><th>⚽</th><th>🟨</th><th>🟥</th><th></th></tr></thead><tbody>
-        ${ps.map((p, index) => { const s = Stats.playerSummary(D(), p.id); return `<tr><td>${String(index + 1).padStart(2, "0")}</td>
+        ${ps.map((p, index) => { const playerNumber = String(index + 1).padStart(2, "0"); const s = Stats.playerSummary(D(), p.id); return `<tr><td>${playerNumber}</td>
           <td class="l"><button class="linkbtn" data-player="${p.id}">${esc(p.name)}</button></td>
           <td class="l">${p.cpf ? esc(Cpf.format(p.cpf)) : '<span class="pill red">sem CPF</span>'}</td>
           <td class="l"><div class="team-cell">${badge(team(p.team_id))}${esc(team(p.team_id)?.name || "")}</div></td>
