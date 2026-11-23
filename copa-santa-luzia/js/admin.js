@@ -199,7 +199,7 @@
       });
       y += rowH;
     });
-    const safeName = t.name.normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase();
+    const safeName = t.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase();
     doc.save("relacao-atletas-" + (safeName || "clube") + ".pdf");
   }
 
