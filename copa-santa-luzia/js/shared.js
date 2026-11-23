@@ -24,12 +24,12 @@
         <td>${String(index + 1).padStart(2, "0")}</td>
         <td class="l"><button class="linkbtn" data-player="${p.id}">${esc(p.name)}</button></td>
         ${admin ? `<td class="l">${p.cpf ? esc(Cpf.format(p.cpf)) : '<span class="pill red">sem CPF</span>'}</td>` : ""}
-        <td class="l">${esc(p.position || "")}</td><td>${s.gols}</td><td>${s.amarelos}</td><td>${s.vermelhos}</td>
+        <td>${s.gols}</td><td>${s.amarelos}</td><td>${s.vermelhos}</td>
         ${admin ? `<td><button class="btn ghost sm" data-act="edit-player" data-id="${p.id}">Editar</button></td>` : ""}</tr>`).join("");
     return `<div class="team-cell" style="margin-bottom:6px">${badge(t)}<h2 style="margin:0">${esc(t.name)}</h2>
         ${t.grp ? `<span class="tag">Grupo ${esc(t.grp)}</span>` : ""}</div>
       <p class="muted small">${ps.length} jogador(es) · ${tot.g} gol(s) · ${tot.y} 🟨 · ${tot.r} 🟥 · toque no nome para ver a ficha</p>
-      ${ps.length ? `<div class="table-wrap"><table><thead><tr><th>Nº</th><th class="l">Jogador</th>${admin ? '<th class="l">CPF</th>' : ""}<th class="l">Posição</th><th>⚽</th><th>🟨</th><th>🟥</th>${admin ? "<th></th>" : ""}</tr></thead><tbody>${body}</tbody></table></div>`
+      ${ps.length ? `<div class="table-wrap"><table><thead><tr><th>Nº</th><th class="l">Jogador</th>${admin ? '<th class="l">CPF</th>' : ""}<th>⚽</th><th>🟨</th><th>🟥</th>${admin ? "<th></th>" : ""}</tr></thead><tbody>${body}</tbody></table></div>`
         : '<p class="muted">Nenhum jogador cadastrado neste clube.</p>'}
       <div class="toolbar" style="margin:14px 0 0"><span class="spacer"></span><button class="btn ghost" data-dlgclose>Fechar</button></div>`;
   }
