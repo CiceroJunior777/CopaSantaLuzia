@@ -104,6 +104,105 @@
     a.href = URL.createObjectURL(new Blob([text], { type: mime || "text/plain;charset=utf-8" }));
     a.download = name; document.body.appendChild(a); a.click(); a.remove();
   };
+
+  /* Gera a relação de atletas no padrão do documento oficial enviado. */
+  async function rosterLogoData() {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+          canvas.getContext("2d").drawImage(img, 0, 0);
+          resolve(canvas.toDataURL("image/png"));
+        } catch (_) { resolve(null); }
+      };
+      img.onerror = () => resolve(null);
+      img.src = "assets/Emblema%20Copa%20Santa%20Luzia%20em%20PNG%20transparente.png";
+    });
+  }
+
+  async function downloadRosterPdf(teamId) {
+    const t = team(teamId);
+    if (!t) throw new Error("Clube não encontrado.");
+    const athletes = D().players.filter(p => p.team_id === teamId)
+      .sort((a, b) => (a.number == null ? 9999 : Number(a.number)) - (b.number == null ? 9999 : Number(b.number)) || a.name.localeCompare(b.name, "pt-BR"));
+    if (!athletes.length) throw new Error("Este clube ainda não possui atletas cadastrados.");
+    if (!window.jspdf || !window.jspdf.jsPDF) throw new Error("Não foi possível carregar o gerador de PDF. Verifique sua conexão e tente novamente.");
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+    const pageW = 297, pageH = 210, margin = 8, tableW = pageW - margin * 2;
+    const cols = [18, 137, 76, 50];
+    const logo = await rosterLogoData();
+    const drawHeader = () => {
+      if (logo) {
+        doc.addImage(logo, "PNG", margin + 2, 6, 31, 31, undefined, "FAST");
+        doc.addImage(logo, "PNG", pageW - margin - 33, 6, 31, 31, undefined, "FAST");
+      }
+      doc.setTextColor(15, 15, 15);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(18);
+      doc.text("COPA SANTA LUZIA DE FUTEBOL", pageW / 2, 14, { align: "center" });
+      doc.setFontSize(10);
+      doc.text("Rua Manoel José Vitorino, Sítio Lagoa – Barbalha – Ceará", pageW / 2, 21, { align: "center" });
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.text("CAMPEONATO DE FUTEBOL AMADOR MASCULINO 2026", pageW / 2, 31, { align: "center" });
+      doc.setFontSize(16);
+      doc.text("RELAÇÃO DE ATLETAS", pageW / 2, 46, { align: "center" });
+
+      let metaY = 58;
+      const meta = (label, value) => {
+        const h = 7;
+        doc.setLineWidth(0.25);
+        doc.rect(margin, metaY, 63, h);
+        doc.rect(margin + 63, metaY, tableW - 63, h);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.text(label, margin + 1.2, metaY + 4.8);
+        if (value) doc.text(value, margin + 63 + (tableW - 63) / 2, metaY + 4.8, { align: "center" });
+        metaY += h;
+      };
+      meta("NOME DO CLUBE:", t.name.toLocaleUpperCase("pt-BR"));
+      meta("DIRETOR:", "");
+      const labels = ["N°", "NOME DO ATLETA", "DOC. IDENTIFICAÇÃO", "N° ATLETA"];
+      let x = margin;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      labels.forEach((label, i) => {
+        doc.rect(x, metaY, cols[i], 7);
+        doc.text(label, x + cols[i] / 2, metaY + 4.8, { align: "center" });
+        x += cols[i];
+      });
+      return metaY + 7;
+    };
+
+    let y = drawHeader();
+    const rowH = 5.8;
+    athletes.forEach((p, index) => {
+      if (y + rowH > pageH - 7) { doc.addPage(); y = drawHeader(); }
+      let x = margin;
+      const values = [
+        String(index + 1).padStart(2, "0"),
+        String(p.name || "").toLocaleUpperCase("pt-BR"),
+        p.cpf ? Cpf.clean(p.cpf) : "",
+        p.number == null ? "" : String(p.number)
+      ];
+      values.forEach((value, i) => {
+        doc.rect(x, y, cols[i], rowH);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        const text = i === 1 ? doc.splitTextToSize(value, cols[i] - 3)[0] : value;
+        doc.text(text, i === 1 ? x + 2 : x + cols[i] / 2, y + 4, i === 1 ? {} : { align: "center" });
+        x += cols[i];
+      });
+      y += rowH;
+    });
+    const safeName = t.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase();
+    doc.save("relacao-atletas-" + (safeName || "clube") + ".pdf");
+  }
+
   const csvCell = (v) => { v = String(v == null ? "" : v); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
   const stamp = (start, i) => { if (!start) return null; const d = new Date(start); d.setHours(d.getHours() + i * 2); return Tournament.fmtLocal(d); };
   const cmpMatch = (a, b) => (Number(Stats.isKO(a)) - Number(Stats.isKO(b))) || ((a.phase_no || 0) - (b.phase_no || 0)) ||
@@ -226,6 +325,7 @@
           <td>${esc(t.short || "—")}</td><td>${esc(t.grp || "—")}</td>
           <td>${D().players.filter(p => p.team_id === t.id).length}</td>
           <td><div class="row-actions"><button class="btn sm" data-roster="${t.id}">Ver jogadores</button>
+          ${D().players.some(p => p.team_id === t.id) ? `<button class="btn ghost sm" data-act="download-roster" data-id="${t.id}">Baixar súmula</button>` : ""}
           <button class="btn ghost sm" data-act="logo-team" data-id="${t.id}">${t.logo ? "Alterar logo" : "Adicionar logo"}</button>
           <button class="btn ghost sm" data-act="edit-team" data-id="${t.id}">Editar</button>
           <button class="btn danger sm" data-act="del-team" data-id="${t.id}">Excluir</button></div></td></tr>`).join("")}
@@ -700,6 +800,7 @@
   const actions = {
     close: () => closeDialog(),
     "edit-team": (b) => openDialog(`<h2>Editar clube</h2>${teamForm(team(b.dataset.id))}`),
+    "download-roster": async (b) => downloadRosterPdf(b.dataset.id),
     "logo-team": (b) => openTeamLogoEditor(b.dataset.id),
     "del-team": async (b) => {
       const t = team(b.dataset.id);
