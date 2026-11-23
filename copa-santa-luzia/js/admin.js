@@ -224,8 +224,6 @@
       <label>Clube*<select name="team_id" required>${teamOptions(p.team_id || filterTeam)}</select></label>
       <label>Nome do jogador*<input name="name" required value="${esc(p.name || "")}"></label>
       <label>CPF* (chave única)<input name="cpf" required inputmode="numeric" maxlength="14" placeholder="000.000.000-00" value="${esc(p.cpf ? Cpf.format(p.cpf) : "")}"></label>
-      <label>Número<input type="number" name="number" min="0" max="999" value="${esc(p.number ?? "")}"></label>
-      <label>Posição<input name="position" value="${esc(p.position || "")}" placeholder="Atacante"></label>
       <button class="btn">${p.id ? "Salvar" : "Adicionar jogador"}</button>
     </div></form>`;
 
@@ -735,7 +733,7 @@
       if (!Cpf.valid(cpf)) throw new Error("CPF inválido. Confira os 11 dígitos.");
       const dup = D().players.find(p => p.cpf === cpf && p.id !== f.id);
       if (dup) throw new Error(`Este CPF já está cadastrado em "${team(dup.team_id)?.name || "?"}" (${dup.name}). Um atleta não pode estar em dois clubes.`);
-      const data = { team_id: f.team_id, name: f.name.trim(), cpf, number: int(f.number), position: (f.position || "").trim() };
+      const data = { team_id: f.team_id, name: f.name.trim(), cpf };
       f.id ? await Store.update("players", f.id, data) : await Store.add("players", data);
       toast("Jogador salvo."); closeDialog();
     },
